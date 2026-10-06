@@ -1,0 +1,69 @@
+Investigation Time
+1h 19m
+SOC210 - Possible Brute Force Detected on VPN
+Severity	High
+Type	Brute Force
+Difficulty	Easy
+Playbook	Brute force - Security Analyst
+MITRE Techniques	T1133, T1110
+SOC Alert Details
+L1 Note	I checked the authentication logs and saw many login failures from the same IP address. It was also detected that the same IP address was attempting to login for different users. Successful login looks suspicious after these failed login attempts.
+Username	mane@letsdefend.io
+Source Address	37.19.221.229
+Destination Address	33.33.33.33
+Alert Trigger Reason	A successful VPN login was detected shortly after failed login attempts from the same source IP address
+Destination Hostname	Mane
+Playbook Answers
+Enrichment & Context
+Your answer: External
+
+External : According to Abuse IPDB, the attacker IP 37.19.221.229 is located in USA and belongs to Web Hosting. https://www.abuseipdb.com/check/37.19.221.229
+
+IP Reputation Control
+Your answer: Next
+
+Traffic Analysis
+Your answer: Next
+
+Determine the Scope
+Your answer: Next
+
+Log Management
+Your answer: Yes
+
+Yes: If the attacker IP (37.19.221.229) is searched on Log Management, the "Login Successful" log is seen at 01:51 PM with the user mane@letsdefend.io.
+
+Does the device need to be isolated?
+Your answer: Yes
+
+Yes. Since the attacker has unauthorized access to the system with the mane@letsdefend.io user, it should be isolated from the network.
+
+Containment
+Your answer: Next
+
+Lesson Learned
+Your answer: Next
+
+Result
+Is this alert True Positive or False Positive?
+Your answer: True Positive
+
+Artifacts
+Type	Value	Comment
+IP Address	37.19.221.229	suspicious ip
+Analyst Note
+Username :
+mane@letsdefend.io
+Source Address :
+37.19.221.229
+Destination Address :
+33.33.33.33
+Alert Trigger Reason :
+A successful VPN login was detected shortly after failed login attempts from the same source IP address
+Destination Hostname :
+Mane
+
+The address of the VPN is United Kingdom, the source address was a malicious IP who tried multiple login and was successful at 06-21-2023, 01:51 PM, we have contained the victim's account, 2 critical url has been found in logs - 2023-06-21 12:05:59
+netstat -ano
+2023-06-21 12:30:18
+move c:\Users\mane\Downloads\test1.csv c:\Users\mane\Documents\test1.csv, which has to be investigated 
