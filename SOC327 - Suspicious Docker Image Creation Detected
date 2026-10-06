@@ -1,0 +1,73 @@
+SOC327 - Suspicious Docker Image Creation Detected
+Severity	High
+Type	Malware
+Difficulty	Medium
+Playbook	IR - Defense Evasion - 4
+MITRE Techniques	T1078, T1133, T1059.004, T1610, T1110, T1071.001, T1041
+SOC Alert Details
+L1 Note	Minutes before the alert, I saw a Brute Force attempt with different users from the IP 37.19.200.2 towards the system. However, I could not determine whether this attack was successful or not.
+Hostname	Murray
+Ip Address	172.16.20.41
+Command Line	docker build -t malicious-docker:latest
+Trigger Reason	The image is being built with a name such as malicious-docker, which raises a red flag due to its association with potential malicious activity.
+Playbook Answers
+Verify
+Your answer: Next
+
+Review Alert Details in the investigation Channel - 1
+Your answer: Next
+
+Review Alert Details in the investigation Channel - 2
+Your answer: Next
+
+Identify Potential Defense Evasion Activity on the Processes or Network
+Your answer: Next
+
+Determine the OS (Operating system)
+Your answer: Linux
+
+To answer this, the IP address (172[.]16.20.41) in the alert should be searched within the Endpoint security. It reveals that the operating system of the corresponding system is 'Ubuntu 20.04.02'.
+
+For Linux
+Your answer: Next
+
+Determine the type of Defense Evasion Techniques Leveraging Exploitation and External Influence
+Your answer: Deploy Container
+
+After the attacker infiltrated the target system, they discovered Docker was installed. Subsequently, the attacker downloaded and ran a malicious image named 'malicious-docker' on the system. One of the reasons for executing the malicious image within Docker is to reduce the likelihood of detection and minimize visibility. This technique can be associated with 'Deploy Container' (T1610) in defense evasion.
+
+IOC Analysis
+Your answer: Yes
+
+The answer is yes. During the investigation, it was found that the attacker had gained unauthorized access to the system via brute force. Following that, the attacker downloaded an attack tool from a GitHub repository. In this case, the attacker’s IP, the tool, hash values, and the URL can be considered as IOCs.
+
+IOC Reputation Check
+Your answer: No · Correct answer: Yes
+
+The IP responsible for the brute force attack is located in the USA and belongs to a web hosting (VPN) IP range. It has been reported multiple times in the past for categories such as SSH, brute force, and malicious activities.
+
+Determine the Scope
+Your answer: No
+
+In this context, when reviewing the logs in the log management system, both shortly before and after the attack, the attacker's IP was checked. The only destination observed was IP address 172[.]16.20.41.
+
+Should the device be isolated?
+Your answer: No · Correct answer: Yes
+
+The system has detected a Brute Force attack originating from the IP address 37[.]19.200.2, located in the USA. As a precaution, the host must be isolated from the network to prevent the spread of any potential malware, pending a detailed investigation.
+
+Result
+Is this alert True Positive or False Positive?
+Your answer: False Positive · Correct answer: True Positive
+
+Analyst Note
+Hostname :
+Murray
+Ip Address :
+172.16.20.41
+Command Line :
+docker build -t malicious-docker:latest
+Trigger Reason :
+The image is being built with a name such as malicious-docker, which raises a red flag due to its association with potential malicious activity.
+
+Both IPs were checked and they aren't malicious, the link malicious GitHub has triggered the alert, but it is just a repository of GitHub, nothing unusual found in the firewall logs, proxy logs and network logs, no sign of unusual download, therefor it's a false positive
