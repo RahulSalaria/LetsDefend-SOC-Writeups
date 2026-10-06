@@ -1,1 +1,74 @@
+Investigation Time
+11m
+SOC176 - RDP Brute Force Detected
+Severity	Medium
+Type	Brute Force
+Difficulty	Medium
+Playbook	Sec - Brute Force Playbook
+MITRE Techniques	T1078, T1078.002, T1059, T1059.003, T1110, T1087
+SOC Alert Details
+Protocol	RDP
+Firewall Action	Allowed
+Source IP Address	218.92.0.56
+Alert Trigger Reason	Login failure from a single source with different non existing accounts
+Destination Hostname	Matthew
+Destination IP Address	172.16.17.148
+Playbook Answers
+Enrichment & Context
+Your answer: External
 
+The traffic originating from IP address 118.69.65[.]60 to the Matthew host is an external IP address.
+
+IP Reputation Check
+Your answer: Yes
+
+Yes, the IP address 218.92.0[.]56 is marked as suspicious in the threat intelligence resources, specifically flagged as malicious by 11 antivirus engines on VirusTotal.
+
+Traffic Analysis
+Your answer: Yes
+
+Yes, upon searching for the attacker IP address 218.92.0[.]56 in the log management system, it reveals 15 firewall logs originating from that IP address attempting to connect to the host named "Matthew" at IP address 172.16.17.148, specifically targeting port 3389 commonly used for Remote Desktop Protocol (RDP) connections.
+
+Determine the Scope
+Your answer: Yes · Correct answer: No
+
+No, the attacker IP address (218.92.0[.]56) attempts to establish an SSH/RDP connection with only one target, which is the host named "Matthew" at the IP address 172.16.17.148. There is no indication of the attacker attempting to target multiple servers or clients simultaneously.
+
+Log Management
+Your answer: Yes
+
+Yes, the brute force attack was successful. After numerous failed login attempts, the attacker managed to successfully log in using the username "Matthew" on the target host at IP address 172.16.17.148.
+
+Should the device be isolated?
+Your answer: Yes
+
+To prevent further data loss or unauthorized access, it is recommended to isolate the system from the network immediately.
+
+Containment
+Your answer: Next
+
+Lesson Learned
+Your answer: Next
+
+Result
+Is this alert True Positive or False Positive?
+Your answer: True Positive
+
+Artifacts
+Type	Value	Comment
+IP Address	218.92.0.56	Source-IP
+Analyst Note
+Protocol :
+RDP
+Firewall Action :
+Allowed
+Source IP Address :
+218.92.0.56
+Alert Trigger Reason :
+Login failure from a single source with different non existing accounts
+Destination Hostname :
+Matthew
+Destination IP Address :
+172.16.17.148
+
+Several attempts were made to logging into several account including admin, guest, Matthew from the ip-218.92.0.56, the account of Matthew was logged in in rdp , and we have contained the account , this has to be further investigated on what actually happened as the account was remotely accessed
