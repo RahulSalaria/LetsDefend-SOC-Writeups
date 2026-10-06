@@ -6,7 +6,6 @@ Type	Exchange
 Difficulty	Medium
 Playbook	Phishing Playbook - Security Analyst
 MITRE Techniques	T1566, T1566.002, T1059, T1204
-⭐ This alert is prepared for the ‘How to Investigate a SIEM Alert’ course. If you haven’t taken the course yet, please complete it first.
 
 SOC Alert Details
 SMTP Address	103.80.134.63
