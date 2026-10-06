@@ -60,6 +60,3 @@ Date:
 The mail was sent From:
 free@coffeeshooop.com to To:
 Felix@letsdefend.io, Upon checking the reputation of the email , it has dns,spf, dkim failed. The mentioned ip -103.80.134.63 was also flagged, upon checking the logs at 2024-05-13 11:52:00, we could only see the mail had come at what particular point , but the malicious file wasnt opened at all , so this is a potentional phishing attack 
-
-https://app.letsdefend.io/case-management/casedetail/rahul0305/1cfd56aa-2056-4e2a-a1ce-71f3c712ec36
-
