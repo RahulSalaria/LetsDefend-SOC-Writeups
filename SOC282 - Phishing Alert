@@ -1,61 +1,211 @@
-# LetsDefend-SOC-Writeups
-Case studies and incident response walkthroughs from LetsDefend platform investigations
-SOC282 - Phishing Alert - Deceptive Mail Detected
-Severity	Medium
-Type	Exchange
-Difficulty	Medium
-Playbook	Phishing Playbook - Security Analyst
-MITRE Techniques	T1566, T1566.002, T1059, T1204
+SOC INCIDENT REPORT
 
-SOC Alert Details
-SMTP Address	103.80.134.63
-Device Action	Allowed
-E-mail Subject	Free Coffee Voucher
-Source Address	free@coffeeshooop.com
-Destination Address	Felix@letsdefend.io
-Playbook Answers
-Parse Email
-Your answer: Next
+==================================================
 
-Are there attachments or URLs in the email?
-Your answer: Yes
+1. ALERT INFORMATION
 
-Upon examining the email on the email security tab, it can be observed that there is a hyperlink attached to the text within the email. <br> https://files-ld.s3.us-east-2.amazonaws[.]com/free-coffee.zip
+Alert Name: SOC282 - Phishing Alert - Deceptive Mail Detected
+Alert ID: SOC282
+Date/Time: 2024-05-13 11:52:00
+Severity: Medium
+Source: External Email Sender – free@coffeeshooop.com
+Detection Rule: Phishing email detected with a suspicious URL and malicious attachment
+Status: Escalated / Under Investigation
 
-Analyze Url/Attachment
-Your answer: Malicious
+2. ALERT SUMMARY
 
-After analyzing the file on TI platforms such as anyrun or VirusTotal, it has been determined that the attachment is malicious. <br> Free_coffee[.]zip
+A suspicious phishing email with the subject "Free Coffee Voucher" was delivered to Felix@letsdefend.io from free@coffeeshooop.com. The email contained a hyperlink to a malicious ZIP archive hosted on an Amazon S3 domain. Email authentication checks reportedly failed for DNS, SPF, and DKIM, and the sender IP address 103.80.134.63 was flagged as suspicious. Investigation findings indicate that the recipient's host accessed the malicious URL, downloaded the file, and executed the malware, requiring immediate endpoint investigation and containment.
 
-Check If Mail Delivered to User?
-Your answer: Delivered
+3. AFFECTED ENTITY
 
-Based on the device action in the alert details, the email was allowed and delivered to the user. The malicious email contains a suspicious URL.
+User: Felix@letsdefend.io
+Hostname: Not provided
+Source IP: 103.80.134.63
+Destination IP: Not provided
+Source Country: Not provided
+Destination: Felix@letsdefend.io
+Process / File / URL / Domain: https://files-ld.s3.us-east-2.amazonaws[.]com/free-coffee.zip
+Email Sender: free@coffeeshooop.com
+Email Subject: Free Coffee Voucher
+Attachment: Free_coffee[.]zip
+Device Action: Allowed
+Relevant IOC: 103.80.134.63; malicious URL and ZIP archive
+Investigation Time: Not provided
 
-Delete Email From Recipient!
-Your answer: Delete
+4. INITIAL TRIAGE
 
-Check If Someone Opened the Malicios File/URL?
-Your answer: Not Opened · Correct answer: Opened
+What triggered the alert?
 
-On the log management and processes tab, it can be seen that Felix’s host accessed the malicious URL, downloaded the malware, and executed it.
+A suspicious email titled "Free Coffee Voucher" was received from free@coffeeshooop.com.
+The sender IP address, 103.80.134.63, was reported as suspicious.
+Email authentication checks reportedly failed for DNS, SPF, and DKIM.
+The email contained a hyperlink directing the recipient to a ZIP archive hosted on an Amazon S3 domain.
+Threat intelligence analysis reportedly classified Free_coffee[.]zip as malicious.
+The email was allowed and delivered to the recipient.
+Investigation findings indicate that the recipient's host accessed the URL, downloaded the file, and executed the malware.
 
-Result
-Is this alert True Positive or False Positive?
-Your answer: True Positive
+Initial assessment:
 
-Analyst Note
-From:
-free@coffeeshooop.com
-To:
-Felix@letsdefend.io
-Subject:
-Free Coffee Voucher
-Sender IP:
-103.80.134.63
-Date:
-2024-05-13 11:52:00
+This alert requires immediate investigation because a suspicious email containing a malicious download was delivered to the user, and the available playbook findings indicate that the recipient interacted with the URL and executed the downloaded file. This raises the risk of endpoint compromise, credential theft, persistence, and unauthorized network activity. Immediate containment and forensic investigation are recommended.
 
-The mail was sent From:
-free@coffeeshooop.com to To:
-Felix@letsdefend.io, Upon checking the reputation of the email , it has dns,spf, dkim failed. The mentioned ip -103.80.134.63 was also flagged, upon checking the logs at 2024-05-13 11:52:00, we could only see the mail had come at what particular point , but the malicious file wasnt opened at all , so this is a potentional phishing attack 
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? Felix@letsdefend.io is identified as the intended recipient of the suspicious email.
+Is the activity expected? The email's legitimacy has not been established. The deceptive subject and suspicious sender details suggest a potential phishing attempt.
+Previous/similar activity? No historical phishing or related email activity was provided.
+User interaction: The playbook findings indicate that Felix's host accessed the malicious URL, downloaded the ZIP archive, and executed the malware.
+Additional checks required: Confirm whether the user opened the email, clicked the link, extracted the archive, or manually executed a file. Review other messages from the same sender and identify additional recipients.
+B. Host Investigation
+Is the host known/authorized? The affected endpoint belongs to the recipient Felix, but the hostname and device identifier were not provided.
+What processes/events occurred? The investigation findings indicate that the host accessed the malicious URL, downloaded the archive, and executed the malware.
+Any suspicious changes? Persistence, new processes, registry modifications, scheduled tasks, and other system changes have not been documented in the supplied evidence.
+Recommended investigation: Identify the downloaded archive and extracted payload, review process creation logs, examine parent-child process relationships, and inspect endpoint detection telemetry.
+Containment recommendation: Isolate the affected endpoint from the network if malware execution is confirmed or compromise is suspected and isolation has not already occurred.
+Additional checks: Scan for malicious files, persistence mechanisms, credential theft, and suspicious outbound connections. Preserve forensic evidence before remediation where practical.
+C. Network Investigation
+Source IP reputation/geolocation: 103.80.134.63 was reported as suspicious. Its geographic location was not provided.
+Destination IP/domain: The URL used the domain files-ld.s3.us-east-2.amazonaws[.]com.
+Ports/protocols: HTTPS is indicated by the URL; specific network connection details were not provided.
+Related connections: The recipient's host reportedly accessed the malicious URL and downloaded the archive.
+Email security action: Allowed; the message was delivered to the recipient.
+Recommended investigation: Review proxy, firewall, DNS, and endpoint network logs for connections to the download domain and any subsequent suspicious destinations.
+Additional checks: Identify possible command-and-control traffic, additional downloads, and other systems that accessed the same URL or domain.
+D. Log Investigation
+Relevant Event IDs: Not provided. Review Windows Security Event ID 4688 for process creation, Event ID 4624 for relevant logons, and Sysmon events where available. Correlate these with email gateway, proxy, DNS, and endpoint security logs.
+Email activity: The email from free@coffeeshooop.com to Felix@letsdefend.io was recorded at 2024-05-13 11:52:00.
+Email authentication: DNS, SPF, and DKIM checks reportedly failed.
+Process execution: The playbook findings indicate that the malicious archive was downloaded and the malware executed on Felix's host. Exact executable names, hashes, process IDs, and timestamps were not supplied.
+DNS activity: No specific DNS query logs were provided.
+Network activity: Access to the malicious URL and download of the ZIP archive were reported.
+Other correlated alerts: No additional correlated alerts were provided.
+Next steps: Correlate the email delivery timestamp with URL access, file download, extraction, and process execution events. Determine the payload's behavior and whether it communicated externally or accessed sensitive information.
+6. INDICATORS / EVIDENCE
+
+IOC 1:
+Type: Sender IP Address
+Value: 103.80.134.63
+Comment: IP address associated with the suspicious email and reported as flagged by threat intelligence.
+
+IOC 2:
+Type: URL
+Value: https://files-ld.s3.us-east-2.amazonaws[.]com/free-coffee.zip
+Comment: Link embedded in the phishing email, reportedly used to download the malicious archive.
+
+IOC 3:
+Type: File
+Value: Free_coffee[.]zip
+Comment: ZIP archive reportedly identified as malicious by threat intelligence analysis.
+
+Additional Evidence:
+
+Sender: free@coffeeshooop.com
+Recipient: Felix@letsdefend.io
+Subject: Free Coffee Voucher
+Date: 2024-05-13 11:52:00
+Email delivery: The email security action was recorded as Allowed.
+Email authentication: DNS, SPF, and DKIM checks reportedly failed.
+User interaction: The playbook findings indicate that the recipient's host accessed the URL, downloaded the archive, and executed the malware.
+Execution evidence: Specific process names, file hashes, and execution timestamps were not supplied and must be obtained from endpoint and process logs.
+7. ANALYSIS
+
+The available evidence indicates a phishing campaign using a deceptive offer to encourage the recipient to download a malicious archive. The email was sent from free@coffeeshooop.com with the subject "Free Coffee Voucher" and contained a link to a ZIP file hosted on an Amazon S3 domain.
+
+The reported failures of DNS, SPF, and DKIM checks, together with the suspicious sender IP and malicious file reputation, support the assessment that the email was malicious. The email gateway allowed the message to be delivered, giving the recipient an opportunity to interact with the link.
+
+The playbook findings indicate that the recipient's host accessed the URL, downloaded the archive, and executed the malware. This is more serious than an attempted phishing email that was never opened or executed. The analyst note states that the file was not opened, but this conflicts with the playbook findings that the file was downloaded and executed. The discrepancy must be resolved by reviewing endpoint and process logs.
+
+If execution is confirmed, the affected endpoint must be treated as potentially compromised. The investigation should establish the malware's behavior, whether credentials were exposed, whether persistence was established, and whether any command-and-control communication or data exfiltration occurred.
+
+Immediate endpoint containment, malicious email removal, indicator blocking, and a review of other recipients are recommended. The incident should remain open until the execution findings and scope of compromise have been established.
+
+8. VERDICT
+
+☒ TRUE POSITIVE
+☐ FALSE POSITIVE
+☐ BENIGN / EXPECTED ACTIVITY
+☐ INCONCLUSIVE
+
+Reason:
+
+The alert is classified as a True Positive because the email contained a suspicious URL and an archive reportedly identified as malicious. The sender IP and email authentication results further support the phishing assessment. The playbook findings report that the recipient's host downloaded and executed the malware. However, the analyst note contradicts this by stating that the file was not opened, so endpoint logs must be reviewed to confirm execution and determine the extent of compromise.
+
+9. MITRE ATT&CK
+
+T1566 – Phishing
+
+The deceptive email was used to deliver a malicious link and encourage the recipient to interact with the content.
+
+T1566.002 – Spearphishing Link
+
+The email contained a hyperlink to a malicious ZIP archive, reportedly accessed by the recipient's host.
+
+T1204 – User Execution
+
+The playbook findings indicate that the downloaded malware was executed on the recipient's host. Confirm the precise execution method and user interaction through endpoint logs.
+
+T1059 – Command and Scripting Interpreter
+
+Not confirmed. No specific command interpreter or script execution evidence was provided. Map this technique only if process or script logs establish the use of a command or scripting interpreter.
+
+Note: T1566 and T1566.002 are supported by the reported phishing email and malicious link. T1204 is applicable if user-driven execution is confirmed. T1059 requires additional evidence.
+
+10. ACTION TAKEN
+Reviewed the phishing alert and identified the sender, recipient, subject, and sender IP.
+Identified the suspicious URL embedded in the email.
+Reviewed the reported threat intelligence findings for Free_coffee[.]zip.
+Confirmed that the email was allowed and delivered according to the alert details.
+Recorded the reported URL access, archive download, and malware execution for endpoint investigation.
+Recommended isolating the affected endpoint if compromise is confirmed or suspected and isolation has not already occurred.
+Recommended deleting or quarantining the malicious email from the recipient's mailbox and searching for other copies.
+Recommended blocking the malicious URL, domain, sender, and file hash where supported by validated indicators and organizational policy.
+Recommended reviewing endpoint telemetry to confirm execution and identify the payload.
+Recommended resetting credentials and revoking sessions if credential compromise is suspected or confirmed.
+Recommended reviewing proxy, DNS, firewall, and endpoint logs for command-and-control activity and potential data exfiltration.
+Recommended searching for other recipients and systems exposed to the same indicators.
+Escalated the incident for further investigation into potential endpoint compromise.
+11. ESCALATION / SENIOR ANALYST NOTE
+
+Investigation identified a suspected phishing email sent from free@coffeeshooop.com to Felix@letsdefend.io with the subject "Free Coffee Voucher." The message contained a link to a ZIP archive reportedly identified as malicious.
+
+Evidence:
+
+The sender IP 103.80.134.63 was reported as suspicious.
+DNS, SPF, and DKIM checks reportedly failed.
+The email was allowed and delivered to Felix@letsdefend.io.
+The URL https://files-ld.s3.us-east-2.amazonaws[.]com/free-coffee.zip was embedded in the email.
+The archive Free_coffee[.]zip was reportedly identified as malicious by threat intelligence analysis.
+The playbook findings indicate that the recipient's host accessed the URL, downloaded the archive, and executed the malware.
+The analyst note states that the file was not opened, creating a discrepancy that must be resolved using endpoint logs.
+
+Verdict: TRUE POSITIVE – phishing email with reported malicious file download and execution.
+
+Recommended action:
+
+Review endpoint and process logs to confirm whether the downloaded payload was executed.
+Identify the malware file, calculate and validate its hash, and analyze its behavior in an appropriate environment.
+Isolate the affected endpoint if compromise is confirmed or suspected.
+Remove the phishing email from the recipient's mailbox and identify other recipients.
+Block validated malicious indicators through email, DNS, proxy, firewall, and endpoint security controls.
+Investigate possible credential theft, persistence, command-and-control communication, and data exfiltration.
+Reset credentials and revoke sessions if account compromise is suspected or confirmed.
+Preserve relevant email, gateway, and endpoint evidence.
+Document the incident scope, containment, eradication, and recovery actions before closure.
+12. CLOSURE
+
+Final Status: Escalated / Under Investigation
+Final Verdict: TRUE POSITIVE – phishing email containing a malicious URL and archive
+Reason: The email contained a suspicious link to a malicious archive, failed reported email authentication checks, and was delivered to the recipient. Playbook findings indicate that the host downloaded and executed the malware, although the analyst note conflicts with this finding. The incident requires endpoint verification and impact assessment before final closure.
+
+Follow-up Required: Yes
+
+Follow-up actions:
+
+Resolve the discrepancy between the reported malware execution and the analyst note.
+Confirm whether the archive was extracted and whether a payload was executed.
+Investigate the affected endpoint for compromise, persistence, and suspicious outbound connections.
+Remove the phishing email and identify other potentially affected recipients.
+Block validated malicious indicators and remediate affected systems.
+Reset credentials and revoke sessions if required by the investigation findings.
+Document the final impact, remediation, and recovery results before closing the incident.
+
+==================================================
