@@ -1,73 +1,222 @@
-SOC327 - Suspicious Docker Image Creation Detected
-Severity	High
-Type	Malware
-Difficulty	Medium
-Playbook	IR - Defense Evasion - 4
-MITRE Techniques	T1078, T1133, T1059.004, T1610, T1110, T1071.001, T1041
-SOC Alert Details
-L1 Note	Minutes before the alert, I saw a Brute Force attempt with different users from the IP 37.19.200.2 towards the system. However, I could not determine whether this attack was successful or not.
-Hostname	Murray
-Ip Address	172.16.20.41
-Command Line	docker build -t malicious-docker:latest
-Trigger Reason	The image is being built with a name such as malicious-docker, which raises a red flag due to its association with potential malicious activity.
-Playbook Answers
-Verify
-Your answer: Next
+SOC INCIDENT REPORT
 
-Review Alert Details in the investigation Channel - 1
-Your answer: Next
+==================================================
 
-Review Alert Details in the investigation Channel - 2
-Your answer: Next
+1. ALERT INFORMATION
 
-Identify Potential Defense Evasion Activity on the Processes or Network
-Your answer: Next
+Alert Name: SOC327 - Suspicious Docker Image Creation Detected
+Alert ID: SOC327
+Date/Time: Not provided
+Severity: High
+Source: Potential external attacker IP – 37.19.200.2
+Detection Rule: Suspicious Docker image creation with a potentially malicious image name
+Status: Escalated / Under Investigation
 
-Determine the OS (Operating system)
-Your answer: Linux
+2. ALERT SUMMARY
 
-To answer this, the IP address (172[.]16.20.41) in the alert should be searched within the Endpoint security. It reveals that the operating system of the corresponding system is 'Ubuntu 20.04.02'.
+An alert was triggered on the Linux host Murray (172.16.20.41) after the command docker build -t malicious-docker:latest was detected. The activity raised concerns about possible container-based defense evasion and malware deployment. An earlier brute-force attempt from 37.19.200.2 targeting the same host was also reported. Although the playbook findings suggest potential unauthorized access and malicious container deployment, the analyst note states that no unusual activity was found in firewall, proxy, or network logs and classifies the alert as a false positive. This discrepancy requires further investigation before the incident can be closed.
 
-For Linux
-Your answer: Next
+3. AFFECTED ENTITY
 
-Determine the type of Defense Evasion Techniques Leveraging Exploitation and External Influence
-Your answer: Deploy Container
+User: Not provided
+Hostname: Murray
+Source IP: 37.19.200.2 (reported source of earlier brute-force attempts)
+Destination IP: 172.16.20.41
+Source Country: United States (reported in the playbook; requires validation)
+Destination: Internal Linux host – Murray
+Operating System: Ubuntu 20.04.02
+Process / File / URL / Domain: docker build -t malicious-docker:latest
+Container Image: malicious-docker:latest
+Related Source: GitHub repository (specific URL not provided)
+Relevant IOCs: 37.19.200.2; 172.16.20.41; suspicious Docker image name; related GitHub repository and any associated hashes, if recovered
+Investigation Time: Not provided
 
-After the attacker infiltrated the target system, they discovered Docker was installed. Subsequently, the attacker downloaded and ran a malicious image named 'malicious-docker' on the system. One of the reasons for executing the malicious image within Docker is to reduce the likelihood of detection and minimize visibility. This technique can be associated with 'Deploy Container' (T1610) in defense evasion.
+4. INITIAL TRIAGE
 
-IOC Analysis
-Your answer: Yes
+What triggered the alert?
 
-The answer is yes. During the investigation, it was found that the attacker had gained unauthorized access to the system via brute force. Following that, the attacker downloaded an attack tool from a GitHub repository. In this case, the attacker’s IP, the tool, hash values, and the URL can be considered as IOCs.
+The command docker build -t malicious-docker:latest was detected on the host Murray.
+The image name malicious-docker was flagged as suspicious by the detection rule.
+A brute-force attempt involving multiple usernames from 37.19.200.2 was observed shortly before the alert.
+The playbook findings suggest that a GitHub-hosted attack tool and a potentially malicious Docker image were involved.
+The playbook reports that the source IP was associated with previous SSH brute-force and malicious activity reports.
+The analyst note states that firewall, proxy, and network logs did not show unusual activity or suspicious downloads.
 
-IOC Reputation Check
-Your answer: No · Correct answer: Yes
+Initial assessment:
 
-The IP responsible for the brute force attack is located in the USA and belongs to a web hosting (VPN) IP range. It has been reported multiple times in the past for categories such as SSH, brute force, and malicious activities.
+This alert requires investigation because a suspicious Docker image build was detected shortly after reported brute-force activity against the same host. If the build was initiated by an unauthorized user and the resulting image contains malicious code, it could provide a way to execute tools within a container and reduce visibility into malicious activity. However, the image name alone does not establish malicious behavior. The Docker build history, image contents, authentication logs, and host telemetry must be reviewed to determine whether the activity was legitimate or malicious.
 
-Determine the Scope
-Your answer: No
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? The account associated with the Docker build was not provided.
+Is the activity expected? Unknown. The system owner or administrator should confirm whether Docker image creation was authorized.
+Previous/similar activity? A brute-force attempt involving multiple usernames from 37.19.200.2 was reported shortly before the alert.
+Authentication status: The L1 note states that it was not possible to determine whether the brute-force attempt was successful. The playbook findings, however, suggest that unauthorized access occurred.
+Additional checks required: Review SSH authentication logs, successful and failed login records, account usage, privilege escalation events, and command history around the time of the Docker build.
+B. Host Investigation
+Is the host known/authorized? The affected host is Murray, with IP address 172.16.20.41, running Ubuntu 20.04.02.
+What processes/events occurred? The command docker build -t malicious-docker:latest was detected.
+Any suspicious changes? The available findings do not conclusively establish whether the image contained malicious code or whether any unauthorized persistence was created.
+Docker investigation: Review Docker daemon logs, image layers, build context, Dockerfile, image creation timestamps, container runtime history, and container configuration.
+Repository investigation: Identify the GitHub repository and inspect its contents, commit history, downloaded files, and any associated hashes.
+Recommended investigation: Determine which user initiated the build, whether the image was successfully created, and whether a container was subsequently started.
+Containment recommendation: Isolate the host if unauthorized access or malicious container activity is confirmed or remains reasonably suspected. The playbook recommends isolation as a precaution.
+C. Network Investigation
+Source IP reputation/geolocation: 37.19.200.2 was reported as originating in the United States and associated with a web hosting or VPN IP range. The playbook also describes previous reports involving SSH brute force and malicious activity. These findings require validation against current threat intelligence.
+Destination IP/domain: 172.16.20.41, hostname Murray.
+Ports/protocols: SSH is relevant to the reported brute-force activity. The specific ports and protocols used for GitHub access or Docker image retrieval were not provided.
+Related connections: The playbook states that the reviewed activity targeted only 172.16.20.41.
+Firewall logs: The analyst note reports no unusual activity.
+Proxy logs: The analyst note reports no suspicious downloads or unusual activity.
+Network logs: The analyst note reports no unusual network behavior.
+Recommended investigation: Correlate outbound connections with Docker build timestamps, inspect DNS and proxy records for GitHub access, and identify whether any image layers or tools were downloaded from external sources.
+Additional checks: Verify whether the GitHub repository was accessed by the affected host and whether the repository contents match the files used in the Docker build.
+D. Log Investigation
+Relevant Event IDs: Not provided. Review Linux authentication logs, including /var/log/auth.log where applicable, SSH service logs, audit logs, shell history, and Docker daemon logs.
+Authentication activity: A brute-force attempt from 37.19.200.2 involving multiple usernames was reported shortly before the alert. Successful unauthorized authentication has not been conclusively demonstrated by the supplied log evidence.
+Process execution: The command docker build -t malicious-docker:latest was identified. The executing account, parent process, exact timestamp, and command arguments beyond the supplied line require validation.
+DNS activity: No suspicious DNS activity was reported in the analyst note.
+Network activity: Firewall, proxy, and network logs reportedly showed no unusual activity or suspicious downloads.
+Container activity: The playbook suggests that a malicious image may have been downloaded and run, but the analyst note disputes this interpretation.
+Other correlated alerts: The earlier brute-force alert is relevant and should be correlated with the Docker activity.
+Next steps: Establish whether the Docker image was built and executed, identify its contents and origin, and verify whether the earlier authentication attempts resulted in unauthorized access.
+6. INDICATORS / EVIDENCE
 
-In this context, when reviewing the logs in the log management system, both shortly before and after the attack, the attacker's IP was checked. The only destination observed was IP address 172[.]16.20.41.
+IOC 1:
+Type: Source IP Address
+Value: 37.19.200.2
+Comment: Source of the reported brute-force attempts. The playbook reports previous SSH brute-force and malicious activity reports associated with this IP.
 
-Should the device be isolated?
-Your answer: No · Correct answer: Yes
+IOC 2:
+Type: Internal IP Address
+Value: 172.16.20.41
+Comment: Host Murray, where the suspicious Docker build command was detected.
 
-The system has detected a Brute Force attack originating from the IP address 37[.]19.200.2, located in the USA. As a precaution, the host must be isolated from the network to prevent the spread of any potential malware, pending a detailed investigation.
+IOC 3:
+Type: Docker Image Name
+Value: malicious-docker:latest
+Comment: Image name associated with the detection. The name is suspicious but is not, by itself, proof that the image contains malware.
 
-Result
-Is this alert True Positive or False Positive?
-Your answer: False Positive · Correct answer: True Positive
+Additional Evidence:
 
-Analyst Note
-Hostname :
-Murray
-Ip Address :
-172.16.20.41
-Command Line :
-docker build -t malicious-docker:latest
-Trigger Reason :
-The image is being built with a name such as malicious-docker, which raises a red flag due to its association with potential malicious activity.
+Operating system: Ubuntu 20.04.02.
+Command line: docker build -t malicious-docker:latest.
+Related activity: A brute-force attempt involving multiple usernames from 37.19.200.2 was reported shortly before the alert.
+GitHub reference: The playbook mentions a potentially malicious GitHub repository, but the exact repository URL and file hashes were not supplied.
+Firewall evidence: The analyst reports no unusual activity in firewall logs.
+Proxy evidence: The analyst reports no suspicious downloads in proxy logs.
+Network evidence: The analyst reports no unusual network activity.
+Evidence gap: No Docker image digest, container ID, Dockerfile, file hash, successful authentication record, or confirmed malicious payload was provided.
+7. ANALYSIS
 
-Both IPs were checked and they aren't malicious, the link malicious GitHub has triggered the alert, but it is just a repository of GitHub, nothing unusual found in the firewall logs, proxy logs and network logs, no sign of unusual download, therefor it's a false positive
+The alert was generated because the host Murray executed a Docker build command using the image name malicious-docker:latest. This activity occurred shortly after a reported brute-force attempt from 37.19.200.2, creating a possible link between unauthorized access and container-based execution.
+
+The playbook findings suggest that an attacker may have accessed the host, obtained an attack tool from GitHub, and used Docker to run a malicious image. Deploying a container can be abused to execute unauthorized code, although Docker image creation is also a normal administrative and development activity.
+
+The analyst note presents conflicting findings. It states that the relevant IP addresses were checked and were not considered malicious, that the GitHub link merely triggered the alert, and that firewall, proxy, and network logs showed no suspicious downloads or unusual activity. However, a lack of suspicious network traffic does not independently prove that the Docker image was benign, just as a suspicious image name does not prove that it was malicious.
+
+The key unresolved questions are whether the brute-force attempt resulted in a successful login, whether the Docker image was actually built and executed, and whether its contents included malicious code. The image's Dockerfile, layers, digest, runtime history, and associated endpoint events should be examined alongside authentication and process logs.
+
+Assessment: The available evidence is insufficient to confirm malicious container deployment or confidently validate the analyst's false-positive conclusion. The alert should remain under investigation until the contradictory findings are resolved.
+
+8. VERDICT
+
+☐ TRUE POSITIVE
+☐ FALSE POSITIVE
+☐ BENIGN / EXPECTED ACTIVITY
+☒ INCONCLUSIVE
+
+Reason:
+
+The suspicious Docker image name and preceding brute-force activity warrant investigation, but the supplied evidence does not conclusively establish unauthorized access or malicious container execution. The analyst note reports no unusual network activity, while the playbook suggests that an attacker downloaded and ran a malicious image. The Docker image contents, authentication history, and execution logs must be reviewed before assigning a definitive True Positive or False Positive verdict.
+
+Note: If subsequent evidence confirms that the image was a legitimate build and that the GitHub repository and related activity were benign, the alert may be closed as a False Positive. If unauthorized access and malicious container execution are confirmed, it should be classified as a True Positive.
+
+9. MITRE ATT&CK
+
+T1610 – Deploy Container
+
+Relevant to the suspected use of a Docker container to execute potentially malicious code. Confirm that the image was deployed or a container was run before treating this technique as established.
+
+T1110 – Brute Force
+
+Relevant to the reported attempts to authenticate using multiple usernames from 37.19.200.2.
+
+T1078 – Valid Accounts
+
+Not confirmed. The supplied evidence does not conclusively demonstrate that a legitimate account was successfully used by an unauthorized actor.
+
+T1133 – External Remote Services
+
+Not confirmed. The reported brute-force activity may involve SSH, but the evidence does not establish use of an external remote service for successful unauthorized access under this technique.
+
+T1059.004 – Unix Shell
+
+Not confirmed by the supplied command line alone. Additional process or shell execution logs are required to establish adversary use of a Unix shell.
+
+T1071.001 – Web Protocols
+
+Not confirmed. No evidence establishes command-and-control communication over web protocols.
+
+T1041 – Exfiltration Over C2 Channel
+
+Not confirmed. No evidence of data exfiltration or command-and-control activity was provided.
+
+Note: T1610 and T1110 are the most relevant investigative mappings based on the reported container build and brute-force attempts. The remaining techniques require additional evidence before they can be attributed to this incident.
+
+10. ACTION TAKEN
+Reviewed the alert and identified the suspicious Docker build command.
+Identified the affected Linux host as Murray (172.16.20.41).
+Recorded the preceding brute-force activity from 37.19.200.2.
+Reviewed the analyst's findings regarding firewall, proxy, and network activity.
+Identified conflicting conclusions between the playbook findings and the analyst note.
+Recommended reviewing SSH authentication logs to determine whether unauthorized access occurred.
+Recommended inspecting the Docker image, Dockerfile, image layers, and runtime history.
+Recommended validating the GitHub repository and identifying any downloaded tools or associated hashes.
+Recommended isolating the host if unauthorized access or malicious container activity is confirmed or remains reasonably suspected.
+Recommended preserving endpoint, authentication, Docker, and network logs.
+Recommended blocking validated malicious indicators in accordance with organizational policy.
+Escalated the incident for further investigation and confirmation of the final verdict.
+11. ESCALATION / SENIOR ANALYST NOTE
+
+Investigation identified a suspicious Docker build command on host Murray (172.16.20.41), shortly after a reported brute-force attempt from 37.19.200.2.
+
+Evidence:
+
+The command docker build -t malicious-docker:latest triggered the alert.
+A brute-force attempt involving multiple usernames from 37.19.200.2 was reported shortly before the alert.
+The affected host runs Ubuntu 20.04.02.
+The playbook findings suggest possible unauthorized access and deployment of a potentially malicious Docker image associated with a GitHub repository.
+The analyst note reports no unusual activity in firewall, proxy, or network logs and concludes that the alert may be a false positive.
+No confirmed malicious payload, image digest, container ID, successful unauthorized login record, or file hash was provided.
+
+Verdict: INCONCLUSIVE – suspicious Docker image creation with conflicting investigation findings.
+
+Recommended action:
+
+Determine whether the brute-force attempt resulted in a successful login.
+Identify the account and process that initiated the Docker build.
+Inspect the Dockerfile, image layers, image digest, and container execution history.
+Validate the GitHub repository and determine whether any downloaded files were malicious.
+Correlate authentication, process, Docker, and network logs.
+Isolate the host if evidence indicates unauthorized access or malicious container execution.
+Preserve forensic evidence and search for related activity across the environment.
+Finalize the verdict only after the discrepancy between the playbook findings and analyst note has been resolved.
+12. CLOSURE
+
+Final Status: Escalated / Under Investigation
+Final Verdict: INCONCLUSIVE – pending validation of Docker image contents and authentication activity
+Reason: A suspicious Docker build command was detected after reported brute-force activity. The playbook suggests potential malicious container deployment, while the analyst note reports no unusual network activity and considers the alert a false positive. The available evidence does not conclusively establish either malicious execution or benign activity.
+
+Follow-up Required: Yes
+
+Follow-up actions:
+
+Confirm whether unauthorized authentication occurred.
+Determine whether the Docker image was created and executed.
+Inspect the image and associated GitHub repository for malicious content.
+Correlate host, authentication, Docker, and network logs.
+Isolate the affected host if compromise is confirmed or reasonably suspected.
+Document the validated findings, containment measures, and final verdict before closing the incident.
+
+==================================================
