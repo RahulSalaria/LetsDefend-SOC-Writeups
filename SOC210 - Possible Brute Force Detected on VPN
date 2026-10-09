@@ -1,69 +1,177 @@
-Investigation Time
-1h 19m
-SOC210 - Possible Brute Force Detected on VPN
-Severity	High
-Type	Brute Force
-Difficulty	Easy
-Playbook	Brute force - Security Analyst
-MITRE Techniques	T1133, T1110
-SOC Alert Details
-L1 Note	I checked the authentication logs and saw many login failures from the same IP address. It was also detected that the same IP address was attempting to login for different users. Successful login looks suspicious after these failed login attempts.
-Username	mane@letsdefend.io
-Source Address	37.19.221.229
-Destination Address	33.33.33.33
-Alert Trigger Reason	A successful VPN login was detected shortly after failed login attempts from the same source IP address
-Destination Hostname	Mane
-Playbook Answers
-Enrichment & Context
-Your answer: External
+SOC INCIDENT REPORT
+==================================================
 
-External : According to Abuse IPDB, the attacker IP 37.19.221.229 is located in USA and belongs to Web Hosting. https://www.abuseipdb.com/check/37.19.221.229
+1. ALERT INFORMATION
+Alert Name: SOC210 - Possible Brute Force Detected on VPN
+Alert ID: SOC210
+Date/Time: 2023-06-21, 01:51 PM (reported successful login; timezone not specified)
+Severity: High
+Source: External IP Address – 37.19.221.229
+Detection Rule: Successful VPN login detected shortly after multiple failed login attempts from the same source IP
+Status: Escalated / Under Investigation
 
-IP Reputation Control
-Your answer: Next
+2. ALERT SUMMARY
+A possible VPN brute-force attack was detected involving repeated failed authentication attempts from the external IP address 37.19.221.229, targeting multiple user accounts. A successful VPN login was subsequently recorded for mane@letsdefend.io at 01:51 PM on June 21, 2023, raising concerns about potential unauthorized account access. The account has reportedly been contained, and two potentially relevant command-related log entries require further investigation.
 
-Traffic Analysis
-Your answer: Next
+3. AFFECTED ENTITY
+User: mane@letsdefend.io
+Hostname: Mane
+Source IP: 37.19.221.229
+Destination IP: 33.33.33.33
+Source Country: United States (reported by AbuseIPDB; requires independent validation)
+Destination: VPN service; VPN location reported as United Kingdom
+Process / File / URL / Domain: VPN authentication; netstat -ano; test1.csv
+Protocol: VPN (specific protocol not provided)
+Relevant IOC: 37.19.221.229
+Investigation Time: 1 hour 19 minutes
 
-Determine the Scope
-Your answer: Next
+4. INITIAL TRIAGE
+What triggered the alert?
 
-Log Management
-Your answer: Yes
+Multiple failed VPN login attempts originated from the same external IP address, 37.19.221.229.
+The source IP attempted authentication using different usernames.
+A successful VPN login was subsequently recorded for mane@letsdefend.io at 01:51 PM on June 21, 2023.
+The source IP was reported as an external address associated with a US-based web hosting provider, according to AbuseIPDB.
+Two potentially relevant command-related log entries were identified: netstat -ano and a file movement command involving test1.csv.
+Initial assessment:
 
-Yes: If the attacker IP (37.19.221.229) is searched on Log Management, the "Login Successful" log is seen at 01:51 PM with the user mane@letsdefend.io.
+This alert requires immediate investigation because repeated authentication failures followed by a successful VPN login may indicate a compromised account. The source IP's reported reputation and attempts against multiple users increase the concern. The command-related log entries require contextual analysis to determine whether they represent legitimate administrative activity, reconnaissance, or potential post-compromise behavior.
 
-Does the device need to be isolated?
-Your answer: Yes
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? The account mane@letsdefend.io is identified in the successful VPN authentication log. The legitimacy of the session has not been confirmed with the account owner.
+Is the activity expected? Unknown. The user should confirm whether they initiated the VPN session at the reported time.
+Previous/similar activity? Multiple failed login attempts from the same source IP targeting different users were reported. Historical authentication patterns have not been provided.
+Account status: The analyst note states that the affected account has been contained.
+Additional checks required: Review recent authentication history, MFA events, account changes, session details, and any other logins from unfamiliar IP addresses.
+B. Host Investigation
+Is the host known/authorized? The destination hostname is reported as Mane. The destination address is 33.33.33.33, associated with the VPN activity in the alert details.
+What processes/events occurred? Two command-related entries were identified:
+2023-06-21 12:05:59 — netstat -ano
+2023-06-21 12:30:18 — move c:\Users\mane\Downloads\test1.csv c:\Users\mane\Documents\test1.csv
+Any suspicious changes? The provided logs do not establish whether the commands were malicious. netstat -ano displays network connections and associated process IDs and may be used for routine troubleshooting or network reconnaissance. Moving a CSV file may be legitimate file management or relevant to an investigation, depending on the file contents and surrounding activity.
+Recommended investigation: Determine which user and process executed each command, correlate the timestamps with VPN authentication, inspect process creation logs, and examine the file's metadata and contents according to evidence-handling procedures.
+C. Network Investigation
+Source IP reputation/geolocation: 37.19.221.229 was reported as suspicious and associated with a US-based web hosting provider according to AbuseIPDB. This information should be revalidated during the investigation.
+Destination IP/domain: 33.33.33.33.
+VPN location: The analyst reports that the VPN service is located in the United Kingdom. This does not independently establish the user's physical location.
+Ports/protocols: The specific VPN protocol and port were not provided.
+Related connections: Repeated failed authentication attempts followed by a successful login were reported. Detailed traffic records were not provided.
+Recommended investigation: Review VPN gateway logs, source and destination connection metadata, session duration, assigned internal IP addresses, MFA results, and connections made after successful authentication.
+D. Log Investigation
+Relevant Event IDs: Not provided. Review the VPN provider's authentication and session logs, identity provider sign-in records, and relevant Windows Security logs if applicable.
+Authentication activity: Multiple failed login attempts from 37.19.221.229 targeting different users were followed by a successful login for mane@letsdefend.io at 01:51 PM on June 21, 2023.
+Process execution: The logs contain netstat -ano at 12:05:59 and a file movement command at 12:30:18. The executing user, parent process, and execution context have not been established.
+DNS activity: No DNS findings were provided.
+Network activity: VPN authentication activity is reported, but detailed connection records and post-login network activity remain to be reviewed.
+Other correlated alerts: No additional correlated alerts were provided.
+Next steps: Correlate all timestamps, verify the timezone, identify the successful session's origin and duration, and establish whether the two command events occurred before or after unauthorized access.
+6. INDICATORS / EVIDENCE
+IOC 1:
+Type: Source IP Address
+Value: 37.19.221.229
+Comment: External IP associated with repeated VPN authentication failures and a subsequent successful login. Reported as suspicious by the analyst.
 
-Yes. Since the attacker has unauthorized access to the system with the mane@letsdefend.io user, it should be isolated from the network.
+IOC 2:
+Type: User Account
+Value: mane@letsdefend.io
+Comment: Account associated with the reported successful VPN login at 01:51 PM on June 21, 2023.
 
-Containment
-Your answer: Next
+IOC 3:
+Type: File Path
+Value: C:\Users\mane\Downloads\test1.csv
+Comment: Source file in a logged move command that relocated the file to the user's Documents directory. Its relevance to the incident has not been established.
 
-Lesson Learned
-Your answer: Next
+Additional Evidence:
 
-Result
-Is this alert True Positive or False Positive?
-Your answer: True Positive
+Repeated failed VPN authentication attempts from 37.19.221.229 targeting multiple user accounts were reported.
+A successful login for mane@letsdefend.io was recorded at 01:51 PM on June 21, 2023.
+AbuseIPDB was cited as the source for the IP's reported location and web hosting association.
+The analyst note states that the affected account has been contained.
+A netstat -ano command was logged at 12:05:59 on June 21, 2023.
+A command to move test1.csv from Downloads to Documents was logged at 12:30:18 on June 21, 2023.
+The supplied information does not establish whether the file was accessed, modified, transferred externally, or used in data exfiltration.
+7. ANALYSIS
+The available evidence is consistent with a possible VPN brute-force attack against the organization's remote access service. The external IP address 37.19.221.229 reportedly attempted authentication against multiple accounts, with repeated failures followed by a successful login for mane@letsdefend.io at 01:51 PM on June 21, 2023.
 
-Artifacts
-Type	Value	Comment
-IP Address	37.19.221.229	suspicious ip
-Analyst Note
-Username :
-mane@letsdefend.io
-Source Address :
-37.19.221.229
-Destination Address :
-33.33.33.33
-Alert Trigger Reason :
-A successful VPN login was detected shortly after failed login attempts from the same source IP address
-Destination Hostname :
-Mane
+This sequence raises a significant concern that the account may have been compromised. The source IP's reported association with a web hosting provider adds context but is not sufficient on its own to establish malicious intent.
 
-The address of the VPN is United Kingdom, the source address was a malicious IP who tried multiple login and was successful at 06-21-2023, 01:51 PM, we have contained the victim's account, 2 critical url has been found in logs - 2023-06-21 12:05:59
-netstat -ano
-2023-06-21 12:30:18
-move c:\Users\mane\Downloads\test1.csv c:\Users\mane\Documents\test1.csv, which has to be investigated 
+Two additional command-related log entries require investigation. The netstat -ano command can be used to inspect active network connections and associated process IDs; depending on context, it may represent routine administration or reconnaissance. The command moving test1.csv from Downloads to Documents may be ordinary file management. Neither entry independently proves malicious activity, and their relationship to the VPN session has not been established.
+
+The reported account containment is an appropriate initial response. However, the incident cannot be considered fully remediated until the successful session is validated, active sessions are addressed, and the affected endpoint and relevant logs have been examined for unauthorized activity.
+
+The analyst should also verify the timestamps and timezone before establishing the sequence of events, as the supplied command timestamps precede the reported successful login time.
+
+8. VERDICT
+☒ TRUE POSITIVE
+☐ FALSE POSITIVE
+☐ BENIGN / EXPECTED ACTIVITY
+☐ INCONCLUSIVE
+
+Reason:
+
+The alert is classified as a True Positive for suspicious VPN brute-force activity because repeated authentication failures from a common external source were followed by a successful login to the targeted account. The account's reported containment and the additional command-related log entries warrant continued incident response. Whether the successful login was definitively unauthorized and whether post-compromise activity occurred remain subject to further validation.
+
+9. MITRE ATT&CK
+T1110 – Brute Force
+
+Repeated authentication failures from the same source IP targeting multiple user accounts support the reported brute-force behavior.
+
+T1133 – External Remote Services
+
+The VPN service provides external remote access. This technique is relevant to investigating potential unauthorized access through the VPN, but the available evidence does not independently establish how the successful session was obtained or whether the account was compromised.
+
+Note: T1110 is supported by the reported authentication pattern. T1133 is relevant to the VPN access context; confirm unauthorized use of the external remote service before treating it as a confirmed adversary technique. Do not map additional techniques solely from the two command entries without supporting evidence.
+
+10. ACTION TAKEN
+Reviewed authentication logs showing multiple failed login attempts from 37.19.221.229.
+Identified a subsequent successful VPN login for mane@letsdefend.io at 01:51 PM on June 21, 2023.
+Reviewed the reported external IP context using AbuseIPDB.
+Recorded the two command-related log entries for further investigation.
+The analyst note states that the affected account has been contained.
+Recommended revoking active VPN sessions and authentication tokens where applicable.
+Recommended resetting the affected account's credentials and reviewing MFA configuration.
+Recommended validating the successful login with the account owner.
+Recommended reviewing endpoint and VPN logs for unauthorized activity following authentication.
+Recommended investigating netstat -ano and the test1.csv move command to determine their execution context and relevance.
+Recommended blocking the source IP through appropriate security controls, subject to organizational policy.
+Escalated the incident for further investigation into possible account compromise and post-authentication activity.
+11. ESCALATION / SENIOR ANALYST NOTE
+Investigation identified suspicious VPN authentication activity involving external IP address 37.19.221.229 and the account mane@letsdefend.io.
+
+Evidence:
+
+Multiple failed VPN login attempts from the same external IP targeting different user accounts were reported.
+A successful VPN login for mane@letsdefend.io was recorded at 01:51 PM on June 21, 2023.
+The source IP was reported as associated with a US-based web hosting provider according to AbuseIPDB.
+The analyst note states that the affected account has been contained.
+The logs include netstat -ano at 12:05:59 and a command moving test1.csv from Downloads to Documents at 12:30:18.
+The relationship between the command execution and the reported successful VPN login remains unconfirmed.
+Verdict: TRUE POSITIVE – suspicious VPN brute-force activity with a reported successful authentication.
+
+Recommended action:
+
+Validate the successful VPN session with the account owner and confirm the timezone of all recorded events.
+Review VPN gateway and identity provider logs to establish the source, duration, and scope of the session.
+Confirm account containment and revoke any remaining unauthorized sessions or tokens.
+Reset credentials and verify MFA protections in accordance with incident response policy.
+Determine which host, account, and process executed the two logged commands.
+Examine test1.csv metadata and contents as appropriate, and check for evidence of unauthorized access or transfer.
+Review endpoint telemetry for process execution, persistence, privilege escalation, lateral movement, and data exfiltration.
+Search for related authentication attempts against other users and remote access services.
+Preserve relevant logs and evidence and document the confirmed scope and remediation before closure.
+12. CLOSURE
+Final Status: Escalated / Under Investigation
+Final Verdict: TRUE POSITIVE – suspicious VPN brute-force activity with reported successful authentication
+Reason: Multiple failed VPN login attempts from a suspicious external IP were followed by a successful login to mane@letsdefend.io. The account has reportedly been contained, but the legitimacy of the session and the significance of subsequent or related command activity require further investigation.
+
+Follow-up Required: Yes
+
+Follow-up actions:
+
+Validate the successful login and confirm whether the account was compromised.
+Confirm account containment and revoke unauthorized active sessions.
+Investigate the two command-related log entries and determine whether they are associated with the incident.
+Review VPN and endpoint logs for evidence of unauthorized access, lateral movement, or data exfiltration.
+Document the final impact, remediation steps, and recovery status before closing the incident.
+==================================================
