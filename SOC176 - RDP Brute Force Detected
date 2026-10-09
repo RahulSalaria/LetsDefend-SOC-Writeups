@@ -1,74 +1,185 @@
-Investigation Time
-11m
-SOC176 - RDP Brute Force Detected
-Severity	Medium
-Type	Brute Force
-Difficulty	Medium
-Playbook	Sec - Brute Force Playbook
-MITRE Techniques	T1078, T1078.002, T1059, T1059.003, T1110, T1087
-SOC Alert Details
-Protocol	RDP
-Firewall Action	Allowed
-Source IP Address	218.92.0.56
-Alert Trigger Reason	Login failure from a single source with different non existing accounts
-Destination Hostname	Matthew
-Destination IP Address	172.16.17.148
-Playbook Answers
-Enrichment & Context
-Your answer: External
+SOC INCIDENT REPORT
+==================================================
 
-The traffic originating from IP address 118.69.65[.]60 to the Matthew host is an external IP address.
+1. ALERT INFORMATION
+Alert Name: SOC176 - RDP Brute Force Detected
+Alert ID: SOC176
+Date/Time: Not provided
+Severity: Medium
+Source: External IP Address – 218.92.0.56
+Detection Rule: Login failures from a single source using multiple non-existent accounts
+Status: Escalated / Under Investigation
 
-IP Reputation Check
-Your answer: Yes
+2. ALERT SUMMARY
+An RDP brute-force attack was detected against the host Matthew (172.16.17.148) from the external IP address 218.92.0.56. Multiple failed login attempts were observed using different usernames, including admin, guest, and Matthew. Investigation findings indicate that the attacker eventually logged in successfully using the username Matthew, suggesting a potential account compromise and unauthorized remote access.
 
-Yes, the IP address 218.92.0[.]56 is marked as suspicious in the threat intelligence resources, specifically flagged as malicious by 11 antivirus engines on VirusTotal.
+3. AFFECTED ENTITY
+User: Matthew
+Hostname: Matthew
+Source IP: 218.92.0.56
+Destination IP: 172.16.17.148
+Source Country: Not confirmed
+Destination: Internal host – Matthew
+Process / File / URL / Domain: Remote Desktop Protocol (RDP)
+Destination Port: 3389
+Protocol: RDP
+Firewall Action: Allowed
+Relevant IOC: 218.92.0.56
+Investigation Time: 11 minutes
 
-Traffic Analysis
-Your answer: Yes
+4. INITIAL TRIAGE
+What triggered the alert?
 
-Yes, upon searching for the attacker IP address 218.92.0[.]56 in the log management system, it reveals 15 firewall logs originating from that IP address attempting to connect to the host named "Matthew" at IP address 172.16.17.148, specifically targeting port 3389 commonly used for Remote Desktop Protocol (RDP) connections.
+Multiple failed RDP login attempts originated from the external IP address 218.92.0.56.
+The source attempted authentication using several usernames, including admin, guest, and Matthew.
+Threat intelligence enrichment identified the source IP as suspicious, with 11 antivirus engines on VirusTotal flagging it as malicious.
+Firewall logs showed 15 connection attempts from the source IP to the target host on port 3389.
+Investigation findings indicated a subsequent successful RDP login using the username Matthew.
+Initial assessment:
 
-Determine the Scope
-Your answer: Yes · Correct answer: No
+This alert requires immediate investigation because the activity is consistent with an RDP brute-force attack followed by a successful authentication. The successful login raises concerns about potential account compromise and unauthorized access to the affected host. Further investigation is required to determine the extent of access, any post-login activity, and whether sensitive data or additional systems were affected.
 
-No, the attacker IP address (218.92.0[.]56) attempts to establish an SSH/RDP connection with only one target, which is the host named "Matthew" at the IP address 172.16.17.148. There is no indication of the attacker attempting to target multiple servers or clients simultaneously.
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? The username Matthew exists in the reported authentication activity, but the legitimacy of the successful login has not been confirmed with the account owner.
+Is the activity expected? Unknown. User validation is required to determine whether the remote login was authorized.
+Previous/similar activity? Multiple failed authentication attempts were reported before the successful login. Historical baseline activity has not been provided.
+Account status: The analyst note states that the Matthew account has been contained.
+Additional checks required: Review account sign-in history, source locations, authentication timestamps, and any account or privilege changes following the successful login.
+B. Host Investigation
+Is the host known/authorized? The target host is identified as Matthew, with internal IP address 172.16.17.148.
+What processes/events occurred? RDP connection attempts were observed, followed by a reported successful login. Post-authentication process execution has not yet been established.
+Any suspicious changes? No evidence of persistence mechanisms, new accounts, scheduled tasks, or system configuration changes has been provided.
+Recommended investigation: Review endpoint telemetry, running processes, Windows Security logs, RDP session records, and recent file or configuration changes.
+Containment recommendation: Isolate the host from the network if compromise is suspected and isolation has not already been performed.
+C. Network Investigation
+Source IP reputation/geolocation: 218.92.0.56 was reported as suspicious and flagged by 11 antivirus engines on VirusTotal. The source country has not been independently confirmed.
+Destination IP/domain: 172.16.17.148, hostname Matthew.
+Ports/protocols: RDP over TCP port 3389. The alert details identify RDP as the protocol.
+Firewall action: Allowed.
+Related connections: Fifteen firewall logs were identified for connections from the source IP to the target host.
+Scope assessment: The available findings indicate that the source targeted one host. No evidence of simultaneous targeting of additional systems was identified in the reviewed activity.
+Recommended investigation: Search firewall, VPN, IDS/IPS, and network logs for related connections before and after the successful authentication.
+D. Log Investigation
+Relevant Event IDs: Not provided. Review Windows Security Event ID 4625 for failed logons, Event ID 4624 for successful logons, and Event ID 4776 if NTLM credential validation is relevant.
+Authentication activity: Multiple failed attempts using different usernames were reported, followed by a successful RDP login using Matthew.
+Process execution: Not yet confirmed. Review process creation events, including Event ID 4688 where available, and endpoint detection telemetry.
+DNS activity: No relevant DNS findings provided.
+Network activity: Fifteen firewall logs showed connection attempts from 218.92.0.56 to 172.16.17.148 on port 3389.
+Other correlated alerts: No additional correlated alerts were provided.
+Next steps: Establish the exact time of the successful login, determine the source of the authenticated session, and correlate post-login activity across endpoint and network logs.
+6. INDICATORS / EVIDENCE
+IOC 1:
+Type: Source IP Address
+Value: 218.92.0.56
+Comment: External source associated with the reported RDP brute-force activity; flagged as suspicious by threat intelligence.
 
-Log Management
-Your answer: Yes
+IOC 2:
+Type: Destination IP Address
+Value: 172.16.17.148
+Comment: Internal host targeted by repeated RDP connection attempts.
 
-Yes, the brute force attack was successful. After numerous failed login attempts, the attacker managed to successfully log in using the username "Matthew" on the target host at IP address 172.16.17.148.
+IOC 3:
+Type: Network Service
+Value: RDP – TCP/3389
+Comment: Remote access service targeted by the source IP.
 
-Should the device be isolated?
-Your answer: Yes
+Evidence:
 
-To prevent further data loss or unauthorized access, it is recommended to isolate the system from the network immediately.
+Fifteen firewall logs were identified for connection attempts from 218.92.0.56 to 172.16.17.148 on port 3389.
+Multiple failed authentication attempts were reported using usernames including admin, guest, and Matthew.
+A successful RDP login using the username Matthew was reported after the failed attempts.
+Threat intelligence enrichment indicated that 11 antivirus engines on VirusTotal flagged the source IP as malicious.
+The firewall action was recorded as Allowed.
+The analyst note states that the Matthew account was contained.
+The available information does not establish what actions were performed during the successful remote session or whether data was accessed or exfiltrated.
+7. ANALYSIS
+The available evidence is consistent with an RDP brute-force attack against the internal host Matthew (172.16.17.148). An external source, 218.92.0.56, attempted to authenticate using multiple usernames, generating repeated failed login events. The firewall permitted the connections to the RDP service on port 3389, and the investigation reportedly identified a subsequent successful login using the username Matthew.
 
-Containment
-Your answer: Next
+The combination of repeated authentication failures, suspicious source-IP reputation, and a subsequent successful login strongly indicates potential unauthorized access. However, the source IP reputation alone does not prove compromise, and the successful authentication must be correlated with Windows Security logs and validated with the account owner.
 
-Lesson Learned
-Your answer: Next
+The reported containment of the Matthew account is a positive initial response. However, account containment alone does not establish that the host is secure or that any active attacker session has been terminated.
 
-Result
-Is this alert True Positive or False Positive?
-Your answer: True Positive
+Further investigation is required to determine whether the successful login was malicious, what actions were performed during the session, whether credentials or sensitive information were exposed, and whether persistence or lateral movement occurred.
 
-Artifacts
-Type	Value	Comment
-IP Address	218.92.0.56	Source-IP
-Analyst Note
-Protocol :
-RDP
-Firewall Action :
-Allowed
-Source IP Address :
-218.92.0.56
-Alert Trigger Reason :
-Login failure from a single source with different non existing accounts
-Destination Hostname :
-Matthew
-Destination IP Address :
-172.16.17.148
+8. VERDICT
+☒ TRUE POSITIVE
+☐ FALSE POSITIVE
+☐ BENIGN / EXPECTED ACTIVITY
+☐ INCONCLUSIVE
 
-Several attempts were made to logging into several account including admin, guest, Matthew from the ip-218.92.0.56, the account of Matthew was logged in in rdp , and we have contained the account , this has to be further investigated on what actually happened as the account was remotely accessed
+Reason:
+
+The alert is classified as a True Positive because the observed activity matches the reported RDP brute-force pattern, the source IP was identified as suspicious, and a successful login using the targeted Matthew account was reported after multiple failed attempts. The successful login indicates potential account compromise and warrants further investigation to confirm the attacker's actions and impact.
+
+9. MITRE ATT&CK
+T1110 – Brute Force
+Repeated authentication attempts using multiple usernames support the reported brute-force behavior.
+
+T1078 – Valid Accounts
+A successful login using the Matthew account was reported. This technique is applicable if the account was used for unauthorized access.
+
+T1078.002 – Domain Accounts
+Apply this sub-technique only if the Matthew account is confirmed to be a domain account. The available evidence does not establish the account type.
+
+T1059 – Command and Scripting Interpreter
+Not confirmed. No evidence of command or script execution after the successful login has been provided.
+
+T1059.003 – Windows Command Shell
+Not confirmed. Requires evidence of Windows Command Prompt execution.
+
+T1087 – Account Discovery
+Not confirmed. Attempts to authenticate with different usernames do not, by themselves, establish account discovery activity.
+
+Note: T1110 is supported by the reported repeated authentication attempts. T1078 is a potential mapping pending confirmation that the successful login was unauthorized. The remaining techniques require additional evidence before being included as confirmed behaviors.
+
+10. ACTION TAKEN
+Investigated the alert and reviewed the reported authentication and firewall activity.
+Identified the source IP address 218.92.0.56 as suspicious through threat intelligence enrichment.
+Reviewed 15 firewall logs associated with attempts to access the target host over RDP.
+Identified reported authentication attempts involving admin, guest, and Matthew.
+Recorded the reported successful RDP login using the Matthew account.
+The analyst note states that the Matthew account was contained.
+Recommended immediate host isolation if compromise is suspected and isolation has not yet been performed.
+Recommended reviewing successful and failed authentication logs and post-login activity.
+Recommended blocking the source IP at appropriate network security controls, subject to validation and organizational policy.
+Escalated the incident for further investigation into the successful remote access and potential compromise.
+11. ESCALATION / SENIOR ANALYST NOTE
+Investigation identified suspicious RDP brute-force activity originating from external IP address 218.92.0.56 and targeting the internal host Matthew (172.16.17.148).
+
+Evidence:
+
+Fifteen firewall logs showed connection attempts from 218.92.0.56 to the target host on TCP port 3389.
+Multiple failed authentication attempts were reported using usernames including admin, guest, and Matthew.
+Threat intelligence enrichment reported that the source IP was flagged as malicious by 11 antivirus engines on VirusTotal.
+A successful RDP login using the username Matthew was reported after the failed attempts.
+The analyst note states that the Matthew account was contained.
+The available findings indicate that one host was targeted; no additional targeted systems were identified in the reviewed activity.
+Verdict: TRUE POSITIVE – suspected RDP brute-force attack with a reported successful authentication.
+
+Recommended action:
+
+Confirm whether the successful RDP session was authorized by validating the activity with the account owner.
+Review Windows Security Event IDs 4624 and 4625, including logon type, timestamps, source address, and account details.
+Determine whether the attacker's session remains active and terminate unauthorized sessions.
+Isolate the affected host if compromise is suspected and isolation has not already occurred.
+Reset the affected account's credentials and revoke relevant active sessions or tokens where applicable.
+Block the malicious source IP at the firewall or other relevant controls, subject to organizational policy.
+Review endpoint telemetry for command execution, new accounts, persistence, privilege escalation, lateral movement, and potential data exfiltration.
+Search the environment for additional authentication attempts from the same source IP and related indicators.
+Preserve relevant logs and endpoint evidence for incident response and root-cause analysis.
+12. CLOSURE
+Final Status: Escalated / Under Investigation
+Final Verdict: TRUE POSITIVE – suspected RDP brute-force attack with reported successful authentication
+Reason: Repeated RDP authentication failures from a suspicious external IP were followed by a reported successful login using the Matthew account. The activity is consistent with a potential account compromise, and further investigation is required to establish the extent of unauthorized access.
+
+Follow-up Required: Yes
+
+Follow-up actions:
+
+Validate the successful login with the account owner.
+Confirm account containment and terminate any unauthorized active sessions.
+Determine whether host isolation has been completed.
+Investigate post-authentication activity and assess potential impact.
+Document the final scope, remediation, and recovery actions before closing the incident.
+==================================================
