@@ -1,70 +1,186 @@
-SOC257 - VPN Connection Detected from Unauthorized Country
-Severity	Low
-Type	Unauthorized Access
-Difficulty	Easy
-Playbook	Incident Responder
-MITRE Techniques	T1595, T1133, T1621
-SOC Alert Details
-URL	https://vpn-letsdefend.io
-Username	monica@letsdefend.io
-Source Address	113.161.158.12
-Destination Address	33.33.33.33
-Alert Trigger Reason	Vpn Connection Detected from Unauthorized Country
-Destination Hostname	Monica
-Playbook Answers
-Connect Machine
-Your answer: Next
+SOC INCIDENT REPORT
+==================================================
 
-Verify
-Your answer: Next
+1. ALERT INFORMATION
+Alert Name: SOC257 - VPN Connection Detected from Unauthorized Country
+Alert ID: SOC257
+Date/Time: Not fully provided; authentication attempts were reported at approximately 02:01 AM
+Severity: Low
+Source: External IP Address – 113.161.158.12
+Detection Rule: VPN Connection Detected from Unauthorized Country
+Status: Escalated / Under Investigation
 
-Determine whether alert was TP or FP
-Your answer: True Positive
+2. ALERT SUMMARY
+An alert was triggered when an authentication request for the account monica@letsdefend.io originated from an unauthorized geographic location, identified as Vietnam, using the source IP address 113.161.158.12. Firewall logs recorded incorrect OTP submissions at approximately 02:01 AM, indicating that the authentication process was not successfully completed despite a suspected correct password. Additional activity involving a command to retrieve computer memory information raised concerns about possible reconnaissance. The account has reportedly been contained, and no executed file or confirmed successful VPN session was identified in the provided evidence.
 
-TP. Firewall log detail at 02:01 shows "Incorrect OTP Code" as the action. It is understood that the attacker Monica entered her password correctly and OTP (One time password) was sent. However, it is thought that the attacker could not access the medium (mail or sms) where the OTP was sent. If he could have accessed the OTP in the relevant medium, he would have successfully logged in to the VPN. Subsequent logs showed that the attacker tried again one minute apart. Similarly, the OTP was entered incorrectly in both logs. Therefore alert is True Positive for VPN connection. However, if alert name was VPN login, it would be False Positive.
+3. AFFECTED ENTITY
+User: monica@letsdefend.io
+Hostname: Monica
+Source IP: 113.161.158.12
+Destination IP: 33.33.33.33
+Source Country: Vietnam
+Destination: https://vpn-letsdefend.io
+Process / File / URL / Domain: https://vpn-letsdefend.io; wmic memorychip get capacity
+Protocol: HTTPS / VPN authentication
+Authentication Status: MFA verification reportedly failed
+Relevant IOC: 113.161.158.12
+Network Provider: Vietnam Post and Telecommunications Corporation (VNPT), as reported in the investigation
+Investigation Time: Not provided
 
-Choose Incident Type
-Your answer: Malware · Correct answer: Unauthorized Access
+4. INITIAL TRIAGE
+What triggered the alert?
 
-Unauthorized Access.A request from the user "Monica@letsdefend.io" to the address "https://vpn-letsdefend.io" from the IP 113.161.158.12 located in Vietnam at 02:01:01 AM was received with http response code 200 (success).
+A VPN authentication request for monica@letsdefend.io originated from 113.161.158.12, an IP address reported to be located in Vietnam.
+Firewall logs at approximately 02:01 AM recorded the action Incorrect OTP Code.
+Additional authentication attempts reportedly occurred approximately one minute apart, with incorrect OTP submissions observed again.
+The investigation indicated that the password may have been entered correctly, but the OTP verification step was unsuccessful.
+The artifact wmic memorychip get capacity was identified, suggesting a possible attempt to retrieve hardware information.
+Initial assessment:
 
-Does the device need to be isolated?
-Your answer: Yes · Correct answer: No
+This alert requires investigation because an authentication request originated from an unauthorized country and reportedly reached the OTP verification stage. The repeated incorrect OTP submissions suggest a possible attempt to access a potentially compromised account. The computer-information command may indicate reconnaissance, but its execution context and relationship to the VPN activity have not been established. Based on the available evidence, MFA appears to have prevented the reported attempts from completing authentication.
 
-No. Although the attacker cannot bypass the MFA structure in the VPN, Monica can be called a Compromised Account because she entered the password correctly. Since the attacker cannot access the system, it does not need to be isolated.
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? The account monica@letsdefend.io is identified in the VPN authentication records.
+Is the activity expected? Unknown. The user should confirm whether they initiated or authorized the authentication attempts.
+Previous/similar activity? Multiple attempts with incorrect OTP codes were reported at approximately one-minute intervals.
+Account status: The analyst note states that the user account has been contained.
+Credential exposure: The investigation suggests that the password may have been entered correctly. This requires confirmation from authentication logs and identity-provider records.
+Additional checks required: Review recent successful logins, password changes, MFA enrollment, recovery methods, active sessions, and any unusual changes to the account.
+B. Host Investigation
+Is the host known/authorized? The destination hostname is identified as Monica. Additional endpoint information was not provided.
+What processes/events occurred? The artifact wmic memorychip get capacity was identified. This command queries installed memory module capacity and may be used for system inventory or reconnaissance.
+Any suspicious changes? No file execution or confirmed malware activity was identified in the supplied investigation findings.
+Execution status: The available evidence does not establish whether the command was executed successfully, which account initiated it, or which host recorded it.
+Recommended investigation: Determine the source of the command artifact, review scheduled-task and process-creation logs, and check whether the command was associated with the affected user or a separate endpoint.
+C. Network Investigation
+Source IP reputation/geolocation: 113.161.158.12 was reported as originating in Vietnam and associated with Vietnam Post and Telecommunications Corporation (VNPT). The analyst described the IP as malicious; independent reputation evidence was not included.
+Destination IP/domain: 33.33.33.33 / https://vpn-letsdefend.io.
+Ports/protocols: HTTPS-based VPN authentication; the specific transport and port details were not provided.
+Related connections: An authentication request at approximately 02:01:01 AM reportedly returned HTTP status code 200. Firewall logs also recorded incorrect OTP codes during authentication attempts.
+Authentication outcome: The HTTP 200 response indicates a successful HTTP-level response, not necessarily successful VPN authentication. The reported OTP failures suggest that MFA verification was not completed.
+Recommended investigation: Correlate VPN gateway, firewall, identity-provider, and MFA-provider logs to confirm whether any authenticated VPN session was established.
+D. Log Investigation
+Relevant Event IDs: Not provided. Review VPN authentication logs, identity-provider sign-in records, MFA audit logs, firewall events, and Windows Security logs where applicable.
+Authentication activity: Incorrect OTP submissions were reported at approximately 02:01 AM, followed by further attempts approximately one minute apart.
+Process execution: The command wmic memorychip get capacity was identified as an artifact. Execution and attribution have not been confirmed.
+DNS activity: No DNS findings were provided.
+Network activity: An HTTPS request to https://vpn-letsdefend.io from 113.161.158.12 was reported with HTTP response code 200.
+Other correlated alerts: No additional correlated alerts were provided.
+Next steps: Confirm whether the password was validated, whether MFA challenges were generated, whether any VPN session was created, and whether the command artifact originated from the affected host.
+6. INDICATORS / EVIDENCE
+IOC 1:
+Type: Source IP Address
+Value: 113.161.158.12
+Comment: External IP reported as originating in Vietnam and associated with the suspicious VPN authentication attempts.
 
-Backup evidences
-Your answer: Next
+IOC 2:
+Type: URL
+Value: https://vpn-letsdefend.io
+Comment: VPN endpoint involved in the authentication request associated with the alert.
 
-Eradication
-Your answer: Next
+IOC 3:
+Type: Command Artifact
+Value: wmic memorychip get capacity
+Comment: Command that retrieves memory module capacity information. Its execution, source, and relationship to the incident require confirmation.
 
-Recovery
-Your answer: Next
+Evidence:
 
-Lesson Learned
-Your answer: Next
+The alert was triggered by a VPN authentication request from a country reported as unauthorized.
+Firewall logs at approximately 02:01 AM recorded Incorrect OTP Code.
+Additional attempts approximately one minute apart reportedly resulted in incorrect OTP submissions.
+The analyst assessment suggests that the password may have been correct, but OTP verification was unsuccessful.
+An HTTP 200 response was reported for a request to https://vpn-letsdefend.io at approximately 02:01:01 AM.
+The investigation identified the artifact wmic memorychip get capacity.
+The analyst reported that no file was observed executing and that the user account had been contained.
+No evidence supplied confirms that a VPN session was successfully established or that data was accessed.
+7. ANALYSIS
+The available evidence indicates a suspicious VPN authentication attempt against the account monica@letsdefend.io from the external IP address 113.161.158.12, reported to be located in Vietnam. The source location triggered the unauthorized-country alert, and the authentication logs recorded repeated incorrect OTP submissions.
 
-Result
-Is this alert True Positive or False Positive?
-Your answer: True Positive
+The repeated MFA failures suggest that the authentication process was not completed. Although the investigation indicates that the password may have been entered correctly, the available evidence does not conclusively establish whether the password was validated or whether the account credentials were compromised. The HTTP 200 response indicates that the web request received a successful HTTP response; it does not establish successful VPN authentication.
 
-Artifacts
-Type	Value	Comment
-URL Address	wmic memorychip get capacity	a schedule task to check the if it is the vm machine or host
-IP Address	113.161.158.12	VietNam Post and Telecom Corporation (VNPT
-Analyst Note
-URL :
-https://vpn-letsdefend.io
-Username :
-monica@letsdefend.io
-Source Address :
-113.161.158.12
-Destination Address :
-33.33.33.33
-Alert Trigger Reason :
-Vpn Connection Detected from Unauthorized Country
-Destination Hostname :
-Monica
+The wmic memorychip get capacity artifact may be associated with system reconnaissance because it retrieves hardware information. However, no evidence establishes that the command was executed on Monica's device or that it was related to the suspicious VPN requests. Its source and execution context must be determined before drawing conclusions about post-authentication activity.
 
-Upon checking the IP address, we could find the IP was being connected from Vietnam and its malicious, the Ip got unauthorized access to the user - Monica's account and there was an attempt to know the computer details, we couldn't see any file being executed, so this was a possible failed attack and the user has been contained
+Based on the supplied evidence, this incident is best understood as a suspicious unauthorized access attempt in which MFA appears to have prevented authentication from completing. The reported account containment is a reasonable precaution. The affected account should be reviewed for possible password exposure, and the VPN logs must be checked to confirm that no successful session was established.
+
+8. VERDICT
+☒ TRUE POSITIVE
+☐ FALSE POSITIVE
+☐ BENIGN / EXPECTED ACTIVITY
+☐ INCONCLUSIVE
+
+Reason:
+
+The alert is classified as a True Positive because suspicious VPN authentication attempts originated from an unauthorized geographic location, and repeated incorrect OTP submissions were recorded. The evidence supports an unauthorized access attempt, but it does not confirm successful VPN access. The incident should therefore be treated as a blocked or potentially unsuccessful access attempt pending validation of the complete authentication logs.
+
+Important distinction: The alert is a True Positive for suspicious authentication activity, not proof of a successful VPN login or confirmed host compromise.
+
+9. MITRE ATT&CK
+T1133 – External Remote Services
+
+Relevant to the attempted access through the organization's externally accessible VPN service. The evidence supports investigating this technique, although successful unauthorized use of the remote service has not been confirmed.
+
+T1621 – Multi-Factor Authentication Request Generation
+
+Potentially relevant if logs confirm that the suspicious authentication attempts generated MFA requests. The incorrect OTP submissions alone do not establish MFA request flooding or repeated push-notification abuse.
+
+T1595 – Active Scanning
+
+Not confirmed. The available evidence does not establish active scanning or probing of systems. The command wmic memorychip get capacity is not, by itself, evidence of network scanning.
+
+Note: T1133 is relevant to the VPN access attempt. T1621 requires supporting MFA request evidence, and T1595 should not be mapped without evidence of scanning activity.
+
+10. ACTION TAKEN
+Reviewed the alert and identified VPN authentication attempts from 113.161.158.12.
+Reviewed firewall logs showing incorrect OTP submissions.
+Recorded the reported HTTP 200 response for the VPN endpoint.
+Identified the wmic memorychip get capacity artifact for further investigation.
+The analyst note states that the affected account has been contained.
+Recommended confirming whether any VPN session was successfully established.
+Recommended validating the authentication attempts with the account owner.
+Recommended resetting the password if credential exposure is suspected or confirmed.
+Recommended reviewing and securing MFA methods and account recovery options.
+Recommended revoking active VPN sessions and tokens if any unauthorized session is found.
+Recommended reviewing endpoint logs to establish the origin and execution status of the command artifact.
+Recommended blocking the source IP if supported by threat intelligence and organizational policy.
+Recommended continued monitoring for further authentication attempts from the same source.
+11. ESCALATION / SENIOR ANALYST NOTE
+Investigation identified suspicious VPN authentication attempts involving external IP address 113.161.158.12 and the account monica@letsdefend.io.
+
+Evidence:
+
+A VPN authentication request originated from an IP reported to be located in Vietnam.
+Firewall logs at approximately 02:01 AM recorded Incorrect OTP Code.
+Further authentication attempts reportedly occurred approximately one minute apart, with incorrect OTP submissions.
+An HTTP 200 response was reported for a request to https://vpn-letsdefend.io; this does not independently prove successful VPN authentication.
+The artifact wmic memorychip get capacity was identified, but its execution and relationship to the incident remain unconfirmed.
+The analyst reported that no file was observed executing and that the user account had been contained.
+Verdict: TRUE POSITIVE – suspicious VPN access attempt; successful authentication has not been established.
+
+Recommended action:
+
+Confirm whether the password was validated and whether MFA challenges were generated.
+Verify that no successful VPN session was created during or after the suspicious attempts.
+Contact the account owner to validate the activity.
+Review identity-provider and MFA audit logs for potential credential exposure or MFA abuse.
+Reset credentials and revoke active sessions if compromise is suspected or confirmed.
+Determine the origin and execution status of wmic memorychip get capacity.
+Review endpoint telemetry for evidence of unauthorized execution, persistence, or other reconnaissance.
+Monitor for repeated authentication attempts and block the source IP if appropriate.
+Preserve relevant logs and document the confirmed outcome before closure.
+12. CLOSURE
+Final Status: Contained / Under Investigation
+Final Verdict: TRUE POSITIVE – suspicious VPN authentication attempt with repeated MFA failures
+Reason: VPN authentication attempts originated from an unauthorized geographic location, and repeated incorrect OTP submissions were recorded. The available evidence suggests that MFA prevented the attempts from completing, but the full authentication logs must be reviewed to confirm that no unauthorized VPN session was established.
+
+Follow-up Required: Yes
+
+Follow-up actions:
+
+Confirm the authentication outcome and verify that no unauthorized VPN session was created.
+Validate the activity with the account owner.
+Review account credentials and MFA security.
+Investigate the source and execution context of wmic memorychip get capacity.
+Continue monitoring for additional suspicious authentication attempts.
+Document final findings and remediation before closing the incident.
+==================================================
