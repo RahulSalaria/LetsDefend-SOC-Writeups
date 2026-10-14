@@ -1,0 +1,288 @@
+SOC INCIDENT REPORT – SOC145: Ransomware Detected
+1. ALERT INFORMATION
+Alert Name: Ransomware Detected
+
+Alert ID: SOC145
+
+Date/Time: Not Provided
+
+Severity: Critical
+
+Source: Endpoint Security / Malware Detection
+
+Detection Rule: Ransomware Detected
+
+Status: Escalated / Open
+
+Playbook: Malware Playbook – Security Analyst
+
+2. ALERT SUMMARY
+A critical ransomware alert was triggered after the executable file ab.exe was detected on the host MarkPRD (IP: 172.16.17.88). The file hash was identified as malicious, and the file was allowed to execute. Investigation notes indicate that the ransomware encrypted files on the machine and approximately 153 KB of data was transmitted externally. The incident is classified as a True Positive and requires immediate containment and further investigation.
+
+3. AFFECTED ENTITY
+User: Not Provided
+
+Hostname: MarkPRD
+
+Source IP: 172.16.17.88
+
+Destination IP: Not Identified
+
+Source Country: Internal/private IP address; geolocation not applicable
+
+Destination: Unknown
+
+Process / File: ab.exe
+
+File Path: Not Provided
+
+File Hash (MD5): 0b486fe0503524cfe4726a4022fa6a68
+
+File Size: 775.50 KB
+
+Related Processes:
+
+C:\Windows\System32\smss.exe
+
+C:\Program Files\Google\Chrome\Application\chrome.exe
+
+Device Action: Allowed
+
+Malware Type: Ransomware
+
+4. INITIAL TRIAGE
+What triggered the alert?
+
+The security alert identified ab.exe as suspected ransomware.
+
+Hash analysis indicated that the executable was malicious.
+
+The endpoint allowed the file to execute, and investigation notes report that files on the machine were encrypted.
+
+Approximately 153 KB of data was reported as transmitted externally.
+
+Initial assessment:
+
+The alert requires immediate investigation because malicious code was allowed to execute on a production host, resulting in reported file encryption and potential data exfiltration. The scope of encryption, the destination of the transmitted data, and the possibility of additional compromised systems must be determined.
+
+5. INVESTIGATION
+A. User Investigation
+Is the user legitimate? Not verified; user information was not provided.
+
+Is the activity expected? No. Execution of a confirmed malicious ransomware executable is suspicious.
+
+Previous/similar activity? Not provided; historical activity requires review.
+
+Recommended investigation: Identify the logged-in user and determine how ab.exe reached the system, including whether it was downloaded, emailed, or executed through another process.
+
+B. Host Investigation
+Is the host known/authorized? The hostname MarkPRD was identified, but authorization details were not provided.
+
+What processes/events occurred?
+
+The executable ab.exe was detected and allowed to run.
+
+The analyst notes associate its execution with activity following Chrome execution.
+
+The editor note states that the ransomware encrypted files on the machine.
+
+Any suspicious changes? File encryption was reported, indicating malicious activity.
+
+Quarantine status: Not quarantined or cleaned, according to the playbook response.
+
+Recommended investigation: Isolate the host, preserve forensic evidence, identify encrypted files, review process execution logs, and determine whether persistence mechanisms or additional malicious files were created.
+
+C. Network Investigation
+Source IP: 172.16.17.88
+
+Source IP reputation/geolocation: Private internal IP; reputation and geolocation were not established.
+
+Destination IP/domain: Not identified.
+
+Ports/protocols: Not provided.
+
+Related connections: Approximately 775.50 Kb of outbound data transfer was reported.
+
+C2 communication: No command-and-control (C2) address was identified in the provided investigation notes.
+
+Recommended investigation: Review firewall, proxy, DNS, and endpoint network telemetry to identify the destination, protocol, timing, and contents or classification of the transferred data.
+
+Note: The reported outbound transfer does not, by itself, establish that data was successfully exfiltrated to an attacker. This requires network evidence and destination verification.
+
+D. Log Investigation
+Relevant Event IDs: Not provided; review applicable Windows Security, Sysmon, and endpoint detection logs.
+
+Authentication activity: Not provided.
+
+Process execution: ab.exe was allowed to execute; Chrome and smss.exe appear in the artifacts.
+
+DNS activity: Not provided.
+
+Network activity: Approximately 153 KB of outbound transfer was reported; destination details are unknown.
+
+Other correlated alerts: Not provided.
+
+Recommended investigation: Correlate process creation, file modification, network connection, and security alerts around the execution time of ab.exe.
+
+6. INDICATORS / EVIDENCE
+IOC 1 – Malicious File Hash
+
+Type: MD5
+
+Value: 0b486fe0503524cfe4726a4022fa6a68
+
+Comment: Identified as malicious during hash analysis.
+
+IOC 2 – Suspicious Executable
+
+Type: File
+
+Value: ab.exe
+
+Size: 775.50 KB
+
+Comment: Malicious ransomware executable; device action was Allowed.
+
+IOC 3 – Affected Host
+
+Type: Host / IP
+
+Value: MarkPRD / 172.16.17.88
+
+Comment: Host associated with the ransomware alert.
+
+Additional Artifacts
+
+C:\Windows\System32\smss.exe
+
+C:\Program Files\Google\Chrome\Application\chrome.exe
+
+These paths were listed in the alert artifacts. Their presence alone does not establish that either executable is malicious.
+
+Evidence:
+
+The file hash was identified as malicious.
+
+The device allowed the executable to run.
+
+The editor note states that the ransomware encrypted files on the machine.
+
+The analyst notes report approximately 153 KB of outbound data transfer.
+
+No C2 address was identified in the supplied notes.
+
+The file was reported as not quarantined or cleaned.
+
+7. ANALYSIS
+The investigation supports a ransomware incident on the host MarkPRD. The executable ab.exe was identified as malicious and was permitted to execute by the device. According to the editor note, the ransomware encrypted files on the affected machine, indicating an actual security impact rather than a harmless detection.
+
+The reported outbound transfer of approximately 775.50 Kb raises an additional concern about possible data exfiltration. However, the destination and contents of the transfer have not been established, and no C2 address was identified in the available evidence.
+
+The relationship between Chrome execution and the launch of ab.exe requires further process-tree and event-log validation. The available evidence does not establish that Chrome itself was compromised or that it directly launched the ransomware.
+
+Because the file was not quarantined or cleaned and encryption was reported, immediate containment, forensic preservation, and recovery assessment are required.
+
+8. VERDICT
+☑ TRUE POSITIVE
+
+☐ FALSE POSITIVE
+
+☐ BENIGN / EXPECTED ACTIVITY
+
+☐ INCONCLUSIVE
+
+Reason:
+
+The alert is a True Positive because ab.exe was identified as malicious ransomware, its execution was allowed, and the investigation notes report that files on the host were encrypted. The reported outbound data transfer further warrants investigation for potential data exfiltration.
+
+9. MITRE ATT&CK
+Technique: T1204 – User Execution
+
+Tactic: Execution
+
+Description: User Execution covers situations in which a user action causes a malicious file or other content to execute.
+
+Evidence mapping: T1204 was supplied in the original alert. However, the exact user action that caused ab.exe to execute has not been established in the provided evidence.
+
+Additional mapping: Ransomware encryption is reported, but no additional MITRE ATT&CK technique is assigned here because the precise execution, encryption, or exfiltration mechanisms have not been established.
+
+10. ACTION TAKEN
+Actions and findings documented:
+
+☑ Investigated the file hash.
+
+☑ Identified the executable as malicious.
+
+☑ Assessed the alert as a True Positive.
+
+☑ Recorded that the file was not quarantined or cleaned.
+
+☑ Identified reported file encryption and outbound data transfer.
+
+☑ Escalation recommended for further clarification and investigation.
+
+Recommended immediate actions:
+
+Isolate MarkPRD from the network to prevent further malicious activity and potential data transfer.
+
+Quarantine or remove the malicious executable after preserving relevant forensic evidence.
+
+Determine the extent of file encryption and identify affected systems or shared drives.
+
+Investigate the destination and contents of the reported 153 KB outbound transfer.
+
+Block confirmed malicious indicators at appropriate security controls.
+
+Assess recovery options and restore affected files from verified clean backups.
+
+Continue monitoring for related activity across the environment.
+
+The recommended actions above should not be interpreted as completed unless confirmed in the incident management system.
+
+11. ESCALATION / SENIOR ANALYST NOTE
+Writing
+
+
+Incident: SOC145 – Ransomware Detected
+
+Affected Host: MarkPRD
+Source IP: 172.16.17.88
+Malicious File: ab.exe
+MD5 Hash: 0b486fe0503524cfe4726a4022fa6a68
+Severity: Critical
+
+Investigation Summary:
+
+Investigation identified a malicious executable, ab.exe, on the affected host. Hash analysis indicated that the file was malicious, and the endpoint allowed it to execute. The editor note reports that the ransomware encrypted files on the machine. Approximately 153 KB of outbound data transfer was also reported, but the destination and contents have not yet been verified.
+
+No C2 address was identified in the available investigation notes. The file was reported as not quarantined or cleaned.
+
+Evidence:
+
+Malicious file hash identified.
+Executable allowed to run on the endpoint.
+File encryption reported on the affected machine.
+Approximately 153 KB of outbound data transfer reported.
+No confirmed C2 address identified.
+Verdict: TRUE POSITIVE
+
+Recommended Actions:
+
+Immediately isolate the affected host and preserve forensic evidence.
+Investigate the scope of encryption and identify any additional affected systems.
+Analyze network telemetry to establish the destination and nature of the outbound data transfer.
+Perform dynamic malware analysis in an isolated environment, if required.
+Remove the malware and initiate recovery using verified clean backups.
+Review related endpoint, network, and authentication logs for lateral movement or additional compromise.
+Escalation Request: Request Senior/L2 analyst review for containment validation, impact assessment, potential data exfiltration investigation, and recovery coordination.
+
+12. CLOSURE
+Final Status: Open / Escalated
+
+Final Verdict: True Positive
+
+Reason: Malicious ransomware was allowed to execute, and file encryption was reported on the affected host. Potential data exfiltration remains under investigation.
+
+Follow-up Required: Yes
+
+Closure criteria: Keep the incident open until containment is confirmed, the extent of encryption and potential data exfiltration has been assessed, the affected system has been remediated, and recovery has been validated.
