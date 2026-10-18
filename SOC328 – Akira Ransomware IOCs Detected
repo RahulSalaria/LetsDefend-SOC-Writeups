@@ -1,0 +1,48 @@
+SOC328 – Akira Ransomware IOCs Detected
+1. Executive Summary
+Severity: High
+Affected Host: Vergil
+IP Address: 172.16.17.130
+Verdict: True Positive
+Status: Endpoint isolated
+Akira ransomware activity was detected after a user executed a malicious file delivered through a phishing email. Ransom notes and encrypted files confirmed ransomware impact.
+
+2. Alert Context
+Detection Source: EDR
+Email Sender: sale[@]thefasted.com
+Subject: Payment Confirmation
+Attachment: payment-confirmation-invoice-12345.zip
+Executed File: Payment Confirmation Invoice #12345.exe
+Execution Path: C:\Users\LetsDefend\Downloads\payment-confirmation-invoice-12345\Payment Confirmation Invoice #12345.exe
+3. Evidence Collected
+File Hash (SHA-256): 2C7AEAC07CE7F03B74952E0E243BD52F2BFA60FADC92DD71A6A1FEE2D14CDD77
+Ransom Note: akira_readme.txt
+Encrypted File Extension: .akira
+EDR Action: Detected
+Variant Identification: ID Ransomware reportedly confirmed Akira.
+4. Investigation
+Reviewed the phishing email and confirmed the suspicious attachment.
+Correlated the downloaded executable with the EDR alert.
+Identified Akira ransom notes and encrypted files.
+Checked email delivery scope and found one recipient.
+No evidence of lateral movement was identified in the available logs.
+5. Analysis and Verdict
+Verdict: True Positive
+
+The executed file, ransom notes, and .akira encrypted files support a confirmed Akira ransomware incident. The endpoint was impacted, and isolation was necessary to limit further damage.
+
+6. MITRE ATT&CK Mapping
+T1566.001 – Spearphishing Attachment: Supported.
+T1486 – Data Encrypted for Impact: Supported.
+T1047, T1059.001, T1059.003, T1485, T1490: Not confirmed; additional telemetry is required.
+7. Response and Escalation
+Action Taken: Isolated the affected endpoint from the network.
+
+Recommended Next Steps:
+
+Preserve forensic evidence and EDR logs.
+Investigate the reported account compromise.
+Hunt for related IOCs across endpoints and email systems.
+Verify eradication and restore affected files from clean backups.
+Confirm recovery before reconnecting the endpoint.
+L2 Handoff: High-severity, True Positive Akira ransomware incident. Endpoint isolation was performed. No lateral movement was identified in the available evidence. Account compromise, potential data exfiltration, and recovery status require further investigation.
