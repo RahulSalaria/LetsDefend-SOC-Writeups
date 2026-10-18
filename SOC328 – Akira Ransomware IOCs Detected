@@ -1,48 +1,92 @@
-SOC328 – Akira Ransomware IOCs Detected
-1. Executive Summary
+SOC Incident Report – SOC328: Akira Ransomware Detection
+1. Incident Summary
+Incident ID: SOC328
+Alert Name: Akira Ransomware IOCs Detected
 Severity: High
-Affected Host: Vergil
-IP Address: 172.16.17.130
+Classification: Ransomware
 Verdict: True Positive
-Status: Endpoint isolated
-Akira ransomware activity was detected after a user executed a malicious file delivered through a phishing email. Ransom notes and encrypted files confirmed ransomware impact.
+Affected Host: Vergil
+Affected IP: 172.16.17.130
+Affected User: Vergil
+Incident Status: Contained – investigation and recovery verification pending
+Summary:
 
-2. Alert Context
+EDR detected a suspicious executable associated with Akira ransomware on the affected endpoint. Investigation identified a phishing email containing an invoice-themed attachment, followed by execution of the extracted executable. The presence of akira_readme.txt and files with the .akira extension supports the ransomware identification. The endpoint was isolated to limit further impact.
+
+2. Alert Details
 Detection Source: EDR
+Initial Access: Phishing – Spearphishing Attachment
 Email Sender: sale[@]thefasted.com
-Subject: Payment Confirmation
+Email Subject: Payment Confirmation
 Attachment: payment-confirmation-invoice-12345.zip
 Executed File: Payment Confirmation Invoice #12345.exe
-Execution Path: C:\Users\LetsDefend\Downloads\payment-confirmation-invoice-12345\Payment Confirmation Invoice #12345.exe
-3. Evidence Collected
-File Hash (SHA-256): 2C7AEAC07CE7F03B74952E0E243BD52F2BFA60FADC92DD71A6A1FEE2D14CDD77
-Ransom Note: akira_readme.txt
-Encrypted File Extension: .akira
+File Path: C:\Users\LetsDefend\Downloads\payment-confirmation-invoice-12345\Payment Confirmation Invoice #12345.exe
+Reported Email Time: 05:25 AM (date and timezone unavailable)
 EDR Action: Detected
-Variant Identification: ID Ransomware reportedly confirmed Akira.
-4. Investigation
-Reviewed the phishing email and confirmed the suspicious attachment.
-Correlated the downloaded executable with the EDR alert.
-Identified Akira ransom notes and encrypted files.
-Checked email delivery scope and found one recipient.
-No evidence of lateral movement was identified in the available logs.
+3. Indicators of Compromise (IOCs)
+
+IOC Type	Value
+SHA-256 (verify against source)	2C7AEAC07CE7F03B74952E0E243BD52F2BFA60FADC92DD71A6A1FEE2D14CDD77
+Malicious Filename	Payment Confirmation Invoice #12345.exe
+Email Sender	sale[@]thefasted.com
+Email Subject	Payment Confirmation
+Ransom Note	akira_readme.txt
+Encrypted File Extension	.akira
+Affected Host	Vergil
+Affected IP	172.16.17.130
+4. Investigation and Findings
+Email investigation: Reviewed email security records and identified an invoice-themed email sent to the affected user. The email attachment was associated with the subsequent executable execution.
+
+Endpoint investigation: Correlated the executable's file path with the EDR alert. Ransom notes named akira_readme.txt and encrypted files with the .akira extension were observed.
+
+Ransomware identification: The available findings, together with the reported ID Ransomware result, support identification of Akira ransomware.
+
+Scope assessment: Email searches identified one recipient. No evidence of lateral movement was found in the available investigation. Additional endpoint and network telemetry should be reviewed before concluding that the incident was limited to one system.
+
+Account assessment: The analyst notes report account compromise. Authentication logs and evidence of credential misuse were not provided, so the scope of account compromise remains to be validated.
+
 5. Analysis and Verdict
 Verdict: True Positive
 
-The executed file, ransom notes, and .akira encrypted files support a confirmed Akira ransomware incident. The endpoint was impacted, and isolation was necessary to limit further damage.
+The alert is classified as a True Positive based on the suspicious executable execution, Akira-associated ransom notes, and encrypted files bearing the .akira extension.
 
+Impact assessment:
+
+Availability: Affected files were encrypted and may be inaccessible.
+Integrity: File integrity was impacted by ransomware encryption.
+Confidentiality: Data exfiltration has not been confirmed or ruled out.
+Lateral Movement: No evidence identified in the available investigation.
+Account Compromise: Reported by the analyst; further validation required.
 6. MITRE ATT&CK Mapping
-T1566.001 – Spearphishing Attachment: Supported.
-T1486 – Data Encrypted for Impact: Supported.
-T1047, T1059.001, T1059.003, T1485, T1490: Not confirmed; additional telemetry is required.
-7. Response and Escalation
-Action Taken: Isolated the affected endpoint from the network.
+T1566.001 – Spearphishing Attachment: Supported by the phishing email and subsequent execution.
+T1486 – Data Encrypted for Impact: Supported by the observed encrypted files and ransomware indicators.
+T1047 – Windows Management Instrumentation: Not confirmed.
+T1059.001 – PowerShell: Not confirmed.
+T1059.003 – Windows Command Shell: Not confirmed.
+T1485 – Data Destruction: Not confirmed.
+T1490 – Inhibit System Recovery: Not confirmed.
+The unconfirmed techniques require additional process, command-line, or system telemetry.
 
-Recommended Next Steps:
+7. Response Actions and Recommendations
+Actions documented as completed:
 
-Preserve forensic evidence and EDR logs.
-Investigate the reported account compromise.
-Hunt for related IOCs across endpoints and email systems.
-Verify eradication and restore affected files from clean backups.
-Confirm recovery before reconnecting the endpoint.
-L2 Handoff: High-severity, True Positive Akira ransomware incident. Endpoint isolation was performed. No lateral movement was identified in the available evidence. Account compromise, potential data exfiltration, and recovery status require further investigation.
+Investigated the suspicious email and endpoint alert.
+Identified indicators consistent with Akira ransomware.
+Reviewed email recipient scope.
+Isolated the affected endpoint from the network.
+Pending validation / recommended actions:
+
+Preserve endpoint, email, and EDR evidence.
+Investigate account compromise and review authentication activity.
+Hunt for the file hash and related indicators across the environment.
+Investigate potential data exfiltration and recovery-inhibition activity.
+Verify eradication and validate clean backups before restoring the system.
+Reconnect the endpoint only after remediation and security validation.
+8. L2 Escalation Notes
+Reason for escalation: High-severity ransomware incident with confirmed indicators of file encryption.
+
+Current status: Endpoint isolation is documented. Eradication and recovery completion have not been established by the available notes.
+
+L2 action required: Validate account compromise, determine the full scope of affected assets, investigate possible exfiltration, and verify remediation and recovery.
+
+Final disposition: True Positive – Akira ransomware activity identified. Endpoint isolated; further investigation and recovery validation required.
