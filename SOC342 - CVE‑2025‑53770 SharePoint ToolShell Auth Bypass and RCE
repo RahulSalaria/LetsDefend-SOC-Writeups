@@ -1,0 +1,743 @@
+SOC INCIDENT INVESTIGATION REPORT
+1. Executive Summary
+Incident / Case ID: SOC342
+Alert Name: CVE-2025-53770 SharePoint ToolShell Authentication Bypass and Remote Code Execution (RCE)
+Severity: Critical
+Incident Category: Web Attack – Exploitation of Vulnerable SharePoint Server
+Detection Source: SIEM / Security Alert Logs (specific platform not provided)
+Affected Hostname: SharePoint01
+Affected IP Address: 172.16.20.17
+Affected User / Account: Not provided
+Verdict: True Positive
+Incident Status: Open – Escalated to Tier 2
+Assigned Analyst: Not provided
+Date and Time of Investigation: Not provided
+
+Summary:
+
+A critical security alert was triggered by suspicious HTTP POST traffic originating from external IP address 107.191.58.76 and targeting the internal Microsoft SharePoint server SharePoint01 (172.16.20.17). The request targeted /_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx, with a spoofed or suspicious Referer header pointing to /_layouts/SignOut.aspx and a content length of 7699 bytes.
+
+The observed activity is consistent with attempted exploitation of CVE-2025-53770, known as ToolShell, which involves unsafe deserialization and can result in remote code execution on vulnerable on-premises SharePoint Server deployments.
+
+The investigation determined that the traffic was malicious, the attack was assessed as successful, and the HTTP response code was reported as 200. The incident was classified as a True Positive and requires escalation to Tier 2 for further investigation, containment, eradication, and impact assessment.
+
+2. Alert Context
+Alert ID: SOC342
+Detection Rule / Alert Name: CVE-2025-53770 SharePoint ToolShell Auth Bypass and RCE
+Alert Timestamp: Not provided
+Timestamp Timezone: Not provided
+Source IP / Host: 107.191.58.76 – External IP address
+Destination IP / Host: 172.16.20.17 – SharePoint01
+Affected User: Not provided
+Process / File Name: Not provided
+File Path: Not provided
+Parent Process: Not provided
+Command Line: Not provided
+
+Alert Trigger Reason:
+
+A suspicious unauthenticated HTTP POST request targeted the SharePoint ToolPane.aspx endpoint. The request contained a large payload and a suspicious Referer header, indicating possible exploitation of CVE-2025-53770.
+
+Observed HTTP Request Details:
+
+Field
+
+Value
+
+HTTP Method
+
+POST
+
+Requested URL
+
+/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx
+
+Referer
+
+/_layouts/SignOut.aspx
+
+User-Agent
+
+Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0
+
+Content-Length
+
+7699 bytes
+
+Source IP
+
+107.191.58.76
+
+Destination IP
+
+172.16.20.17
+
+Destination Hostname
+
+SharePoint01
+
+Device Action
+
+Allowed
+
+Reported HTTP Response Code
+
+200
+
+Initial Assessment:
+
+The alert requires investigation because the request originated from an external IP address, targeted a sensitive SharePoint application endpoint, and was allowed by the security device. The request pattern is consistent with exploitation of a known critical SharePoint vulnerability.
+
+The reported HTTP 200 response indicates that the server returned a successful HTTP response, but it does not independently prove that arbitrary code execution occurred. The lab findings, however, classify the attack as successful. Server-side execution evidence and post-exploitation activity should be verified by Tier 2.
+
+3. Evidence Collected and IOCs
+IOC / Evidence Type
+
+Value
+
+Source
+
+Status / Notes
+
+Source IP
+
+107.191.58.76
+
+SOC alert
+
+Flagged external IP; associated with malicious traffic
+
+Destination IP
+
+172.16.20.17
+
+SOC alert
+
+Internal SharePoint server
+
+Hostname
+
+SharePoint01
+
+SOC alert
+
+Affected asset
+
+URL / Endpoint
+
+/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx
+
+HTTP request details
+
+Suspicious exploitation target
+
+Referer
+
+/_layouts/SignOut.aspx
+
+HTTP request details
+
+Suspicious or potentially spoofed header
+
+HTTP Method
+
+POST
+
+HTTP request details
+
+Malicious request method and endpoint combination
+
+Content Length
+
+7699 bytes
+
+HTTP request details
+
+Large request payload; content not provided
+
+User-Agent
+
+Firefox 120.0 on Windows 10 64-bit
+
+HTTP request details
+
+Client-supplied header; can be spoofed
+
+HTTP Response
+
+200
+
+Investigation findings
+
+Reported successful response; execution requires further validation
+
+CVE
+
+CVE-2025-53770
+
+Alert and investigation
+
+ToolShell vulnerability
+
+File Hash
+
+Not provided
+
+Not provided
+
+No file hash available
+
+Filename
+
+Not provided
+
+Not provided
+
+Requires endpoint investigation
+
+File Path
+
+Not provided
+
+Not provided
+
+Requires endpoint investigation
+
+Email Sender
+
+Not provided
+
+Email review
+
+No sender identified
+
+Email Subject
+
+Not provided
+
+Email review
+
+No subject identified
+
+Process Name
+
+Not provided
+
+Endpoint logs
+
+Requires investigation
+
+Registry Key
+
+Not provided
+
+Endpoint logs
+
+Persistence not verified
+
+User / Account
+
+Not provided
+
+Authentication logs
+
+Account compromise not verified
+
+Evidence References:
+
+Event IDs: Not provided.
+
+EDR / SIEM Log References: SOC342 alert and associated investigation findings; exact log identifiers not provided.
+
+Email Security Logs: The relevant IP address and hostname were reportedly searched in emails received during the specified dates. No exact dates or detailed results were provided.
+
+Screenshots / Attachments: Not provided.
+
+Evidence Storage Location: Not provided.
+
+Evidence Handling Note: Preserve the original HTTP request and response, reverse-proxy and firewall logs, SharePoint/IIS logs, relevant server event logs, and endpoint telemetry. Record timestamps with timezone and retain evidence references.
+
+4. Investigation and Findings
+Step 1: Alert Validation
+Action Performed: Reviewed the SOC alert and evaluated the source IP, destination server, requested URL, HTTP method, Referer header, and payload size.
+
+Tool / Log Source: SOC alert details and network/HTTP logs; specific tools not provided.
+
+Finding: An external source IP, 107.191.58.76, sent a suspicious HTTP POST request to the SharePoint ToolPane.aspx endpoint on SharePoint01. The security device allowed the request.
+
+Conclusion: The traffic was determined to be malicious and associated with suspected exploitation of CVE-2025-53770.
+
+Step 2: Endpoint / System Investigation
+Action Performed: Reviewed the identified SharePoint server and the available investigation findings.
+
+Tool / Log Source: SharePoint server and network logs; exact tools and log identifiers not provided.
+
+Finding: The destination was identified as SharePoint01 (172.16.20.17). The lab investigation assessed the exploitation attempt as successful.
+
+Conclusion: The server must be treated as potentially compromised. Detailed endpoint telemetry, web-shell checks, file modifications, and system integrity checks remain necessary to independently establish the extent of compromise.
+
+Step 3: Process and Execution Analysis
+Process Name: Not provided
+Parent Process: Not provided
+Command Line: Not provided
+Execution Timestamp: Not provided
+
+Finding: The alert identifies a suspicious HTTP request associated with a vulnerability capable of remote code execution. No process creation logs, command-line evidence, or execution artifacts were supplied.
+
+Conclusion: Remote code execution was reported as successful in the lab findings, but the exact process, command, and execution time have not been independently documented. Tier 2 should investigate IIS worker process activity, child processes, suspicious PowerShell or command-shell execution, and web-shell artifacts.
+
+Step 4: Initial Access Investigation
+Suspected Initial Access Method: Exploitation of a vulnerable on-premises SharePoint Server through CVE-2025-53770.
+
+Email / Download / Network Evidence:
+
+Source IP: 107.191.58.76
+
+Destination: 172.16.20.17 (SharePoint01)
+
+Method: HTTP POST
+
+Endpoint: /_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx
+
+Referer: /_layouts/SignOut.aspx
+
+Content length: 7699 bytes
+
+Device action: Allowed
+
+Finding: The request pattern is consistent with ToolShell exploitation. The investigation identified the traffic as malicious. The analyst also searched relevant IP and hostname information in emails received during the specified dates; detailed results were not supplied.
+
+Conclusion: Network-based exploitation is the supported initial-access hypothesis. No evidence was provided to establish phishing, malicious downloads, or a specific compromised account as the initial access vector.
+
+Step 5: Scope and Lateral Movement
+Other Affected Hosts: Not identified in the provided findings.
+Related Users / Accounts: Not provided.
+Network Connections: External IP 107.191.58.76 communicated with SharePoint01 at 172.16.20.17.
+Lateral Movement Evidence: Not provided.
+
+Finding: The available evidence confirms suspicious inbound traffic to the SharePoint server. There is insufficient information to determine whether the attacker accessed additional systems, obtained credentials, or established other network connections.
+
+Scope Assessment: Inconclusive – only the initial targeted server is identified in the supplied evidence.
+
+Conclusion: Tier 2 should investigate adjacent systems, authentication logs, outbound connections, administrative activity, and internal network traffic for indicators of lateral movement.
+
+Step 6: Impact Assessment
+Malicious Activity Confirmed: Yes, according to the lab findings.
+Files / Systems Affected: SharePoint01 is the identified target; specific modified files are not provided.
+Data Exfiltration: Inconclusive – no data-transfer or exfiltration evidence supplied.
+Credential Compromise: Inconclusive – no credential theft evidence supplied.
+Persistence Identified: Not verified.
+Business Impact: Potential compromise of the SharePoint server, including unauthorized code execution, data access, service disruption, credential exposure, or persistence.
+
+Finding: The attack was classified as successful in the lab investigation. However, the actual extent of access, data exposure, persistence, and impact on business operations has not been established by the supplied evidence.
+
+Conclusion: Treat SharePoint01 as potentially compromised pending a complete forensic investigation. Determine whether a web shell or other persistence mechanism was deployed and whether sensitive data or credentials were accessed.
+
+5. Analysis and Verdict
+Final Verdict: True Positive
+Threat Classification: Malicious Web Attack – SharePoint ToolShell Exploitation / Unsafe Deserialization Leading to Remote Code Execution
+Root Cause / Initial Access: Suspected exploitation of CVE-2025-53770 against the SharePoint ToolPane.aspx endpoint.
+Confirmed Impact: Malicious inbound traffic reached the target server, the device allowed the request, and the lab findings assessed the attack as successful. The HTTP response code was reported as 200.
+Scope of Compromise: SharePoint01 (172.16.20.17) is the identified target. Further compromise of files, processes, accounts, or connected systems remains unverified.
+
+Justification:
+
+The incident is classified as a True Positive based on the following evidence:
+
+The request originated from the external IP address 107.191.58.76 and targeted the internal SharePoint server 172.16.20.17.
+
+The HTTP POST request targeted /_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx, a suspicious endpoint in the context of CVE-2025-53770.
+
+The request included a large payload of 7699 bytes and a suspicious Referer header.
+
+The device action was recorded as Allowed, and the investigation reported an HTTP response code of 200.
+
+The investigation findings identified the traffic as malicious and assessed the exploitation as successful.
+
+The incident was determined not to be a planned test and was escalated to Tier 2.
+
+Technical Classification: The appropriate attack type is unsafe deserialization leading to remote code execution (RCE), rather than SQL injection.
+
+Evidence Limitations: The exact payload, server-side execution artifacts, web-shell evidence, process creation records, and post-exploitation commands were not provided. An HTTP 200 response alone is not sufficient to prove RCE, so these artifacts must be collected to validate the precise impact and scope.
+
+6. MITRE ATT&CK Mapping
+The supplied playbook lists the following MITRE ATT&CK techniques. The mapping below distinguishes the activity directly supported by the available evidence from techniques that require additional validation.
+
+Technique ID
+
+Technique Name
+
+Supporting Evidence
+
+Confidence
+
+T1190
+
+Exploit Public-Facing Application
+
+Malicious HTTP POST targeting the vulnerable SharePoint endpoint
+
+Confirmed at the incident-classification level
+
+T1078
+
+Valid Accounts
+
+Authentication bypass is associated with the vulnerability, but no valid account use was documented
+
+Tentative
+
+T1047
+
+Windows Management Instrumentation
+
+No WMI execution evidence provided
+
+Tentative
+
+T1059.003
+
+Windows Command Shell
+
+RCE was reported, but no command-shell process evidence was supplied
+
+Tentative
+
+T1204.002
+
+Malicious File
+
+No evidence of user execution of a malicious file
+
+Tentative
+
+T1569.002
+
+Service Execution
+
+No evidence of service-based execution
+
+Tentative
+
+T1505.003
+
+Web Shell
+
+No web-shell file or execution artifact supplied
+
+Tentative
+
+T1543.003
+
+Windows Service
+
+No evidence of malicious Windows service creation
+
+Tentative
+
+T1016
+
+System Network Configuration Discovery
+
+No command or telemetry showing network configuration discovery
+
+Tentative
+
+T1033
+
+System Owner/User Discovery
+
+No evidence of user-discovery commands
+
+Tentative
+
+T1049
+
+System Network Connections Discovery
+
+No evidence of host-based network connection discovery
+
+Tentative
+
+T1057
+
+Process Discovery
+
+No process-discovery commands or artifacts supplied
+
+Tentative
+
+T1082
+
+System Information Discovery
+
+No evidence of system-information discovery
+
+Tentative
+
+T1083
+
+File and Directory Discovery
+
+No evidence of file or directory enumeration
+
+Tentative
+
+T1087
+
+Account Discovery
+
+No account-discovery commands or artifacts supplied
+
+Tentative
+
+T1518
+
+Software Discovery
+
+No evidence of installed software discovery
+
+Tentative
+
+Mapping Notes:
+
+T1190 is the strongest mapping because the observed traffic and investigation findings support exploitation of a vulnerable application.
+
+The reported successful RCE does not, by itself, confirm any specific post-exploitation technique. Process telemetry, command lines, file artifacts, service logs, and other forensic evidence are needed to confirm the remaining techniques.
+
+T1078 should not be considered confirmed solely because the vulnerability is described as an authentication bypass; no actual valid-account use was documented.
+
+The supplied MITRE techniques are retained for investigation coverage, but those without supporting evidence remain tentative.
+
+7. Response and Remediation
+Actions Completed
+
+Alert reviewed and validated as malicious.
+
+Source and destination IP addresses identified.
+
+Suspicious HTTP POST request and targeted endpoint documented.
+
+Attack classified as a True Positive.
+
+Incident assessed as successful in the lab findings.
+
+Tier 2 escalation identified as required.
+Actual Actions Taken:
+
+The alert was investigated using the available SOC findings. The traffic was identified as malicious, the suspected vulnerability was identified as CVE-2025-53770, and the incident was marked for Tier 2 escalation.
+
+Endpoint isolation, firewall blocking, credential resets, web-shell removal, patch deployment, and system recovery were not documented as completed. They must not be recorded as performed without verification.
+
+Pending Actions / Recommendations
+Action
+
+Responsible Team
+
+Status
+
+Escalate incident to Tier 2 for forensic investigation
+
+L1 SOC / SOC Lead
+
+Required; completion not independently verified
+
+Preserve HTTP request and response, IIS logs, firewall logs, and endpoint telemetry
+
+SOC / Incident Response
+
+Pending verification
+
+Investigate web shells, unauthorized files, scheduled tasks, services, and other persistence mechanisms
+
+Tier 2 / DFIR
+
+Pending
+
+Review process execution and child processes spawned by IIS worker processes
+
+Tier 2 / Endpoint Security
+
+Pending
+
+Confirm SharePoint version, patch level, and exposure to CVE-2025-53770
+
+SharePoint / Infrastructure Team
+
+Pending
+
+Apply the applicable vendor security updates and follow official mitigation guidance
+
+SharePoint / Infrastructure Team
+
+Pending verification
+
+Restrict or isolate the affected server if compromise is confirmed and operationally feasible
+
+Incident Response / Infrastructure
+
+Pending assessment
+
+Block or restrict the malicious source IP where appropriate
+
+Network Security
+
+Pending verification
+
+Review authentication logs and assess potential credential exposure
+
+Identity / Security Team
+
+Pending
+
+Hunt for the same indicators across other SharePoint servers and internal systems
+
+Threat Hunting / Tier 2
+
+Pending
+
+Assess potential data access or exfiltration
+
+DFIR / Data Security
+
+Pending
+
+Validate eradication and recovery before restoring normal connectivity
+
+Incident Response / Infrastructure
+
+Pending
+
+Remediation Note: Because the incident is assessed as a successful exploitation attempt, remediation should follow the organization's incident response process. Preserve evidence before destructive remediation when feasible, verify the server's integrity, and follow Microsoft's official guidance for the affected SharePoint version.
+
+8. L2 Escalation / Handoff
+Reason for Escalation:
+
+The incident is classified as a Critical-severity True Positive involving suspected exploitation of CVE-2025-53770, with remote code execution reported as successful. Tier 2 investigation is required to establish the full extent of compromise and coordinate containment and recovery.
+
+Confirmed Findings:
+
+Malicious inbound traffic originated from 107.191.58.76.
+
+The target was SharePoint01 (172.16.20.17).
+
+The attacker sent an HTTP POST request to the SharePoint ToolPane.aspx endpoint.
+
+The request had a content length of 7699 bytes and a suspicious Referer header.
+
+The device action was Allowed.
+
+The HTTP response code was reported as 200.
+
+The lab investigation classified the attack as successful and the alert as a True Positive.
+
+The incident was determined not to be a planned test.
+
+Affected Assets:
+
+SharePoint01 – 172.16.20.17
+
+External source IP – 107.191.58.76
+
+Containment Status: Not provided / Not verified.
+
+Unresolved Questions:
+
+Was arbitrary code execution confirmed through process or server-side evidence?
+
+Was a web shell or other persistence mechanism deployed?
+
+Were credentials, authentication tokens, or sensitive SharePoint data accessed?
+
+Were there additional affected servers or lateral movement attempts?
+
+Was any data exfiltrated?
+
+Has the vulnerable SharePoint installation been patched or mitigated?
+
+Have containment and recovery actions been performed and validated?
+
+Actions Required from L2:
+
+Obtain and analyze full HTTP request/response data and SharePoint/IIS logs.
+
+Examine endpoint telemetry, process trees, suspicious file creation, and web-shell indicators.
+
+Determine the attack timeline and identify subsequent attacker activity.
+
+Review authentication events, privileged accounts, outbound connections, and potential lateral movement.
+
+Determine the need for containment, credential resets, and session revocation.
+
+Verify patching and remediation against the applicable Microsoft security guidance.
+
+Expand threat hunting to other exposed SharePoint systems.
+
+Document the scope, impact, eradication, and recovery results.
+
+Evidence / Log References: SOC342 alert; HTTP request metadata supplied in the case description. Specific event IDs, log paths, and evidence repository references were not provided.
+
+Escalated To: Tier 2 SOC – intended escalation; individual recipient not provided.
+Escalation Timestamp: Not provided.
+
+Handoff Summary:
+
+A Critical-severity alert identified malicious external HTTP POST traffic from 107.191.58.76 to the SharePoint server 172.16.20.17 through the ToolPane.aspx endpoint. The activity is consistent with CVE-2025-53770 ToolShell exploitation, which can enable remote code execution through unsafe deserialization. The device allowed the request, and the lab findings report a successful attack with an HTTP 200 response. The alert is classified as a True Positive and requires Tier 2 escalation. Containment, persistence analysis, credential exposure, data exfiltration, lateral movement, and recovery have not been verified and remain priorities for the receiving analyst.
+
+9. Closure and Lessons Learned
+Final Incident Status: Open – Pending Tier 2 Investigation
+Eradication Verified: No
+Recovery Verified: No
+Business Owner / Team Notified: Not provided
+Root Cause Confirmed: Partially – suspected exploitation of CVE-2025-53770; underlying server patch status and complete attack chain not verified
+Preventive Measures:
+
+Apply applicable Microsoft security updates for the affected SharePoint deployment.
+
+Review SharePoint exposure to untrusted networks and restrict access where operationally appropriate.
+
+Monitor suspicious requests to ToolPane.aspx and related SharePoint endpoints.
+
+Review IIS worker process behavior for unexpected command shells, PowerShell, and other suspicious child processes.
+
+Implement or validate web-shell detection and file-integrity monitoring.
+
+Review privileged credentials and sessions if evidence indicates potential exposure.
+
+Improve logging and alert correlation across SharePoint, IIS, firewall, endpoint, and identity systems.
+
+Detection Improvements:
+
+Alert on suspicious POST requests to sensitive SharePoint endpoints, especially when combined with unusual payload sizes or suspicious headers.
+
+Correlate inbound exploitation attempts with subsequent process creation, file writes, service creation, and outbound connections.
+
+Hunt for the source IP and other indicators across relevant logs while recognizing that attacker infrastructure can change.
+
+Maintain a documented investigation procedure for critical SharePoint vulnerabilities and potential web-shell deployment.
+
+Validate that HTTP status codes are not used as the sole indicator of successful exploitation.
+
+Closure Timestamp: Not provided.
+Closing Analyst: Not provided.
+
+Lessons Learned:
+
+This incident demonstrates the importance of investigating suspicious application-layer traffic against externally accessible enterprise services. An allowed HTTP request targeting a vulnerable SharePoint endpoint can indicate a serious compromise risk, particularly when associated with a known RCE vulnerability.
+
+The key lessons are to preserve evidence early, validate exploitation through endpoint and server-side telemetry, distinguish confirmed activity from hypotheses, and escalate critical incidents promptly. The incident should not be marked resolved until containment, eradication, patch verification, and recovery validation have been completed and documented.
+
+Analyst Notes
+Record all investigation timestamps with the correct timezone.
+
+Preserve the original HTTP request and response, relevant logs, and forensic evidence.
+
+Do not treat HTTP 200 as conclusive proof of remote code execution without corroborating evidence.
+
+Distinguish the lab's reported successful exploitation from independently verified endpoint artifacts.
+
+Do not mark containment, eradication, or recovery as complete unless the actions have been performed and verified.
+
+The current report reflects the evidence supplied for SOC342; missing fields are explicitly marked as not provided or not verified.
+
+
